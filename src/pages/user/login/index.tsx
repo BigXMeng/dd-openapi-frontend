@@ -1,11 +1,7 @@
 import { Footer } from '@/components';
-import { login } from '@/services/ant-design-pro/api';
 import {
-  AlipayCircleOutlined,
   LockOutlined,
-  TaobaoCircleOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
 } from '@ant-design/icons';
 import {
   LoginForm,
@@ -17,6 +13,8 @@ import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+import {login} from "@/services/dd-ms-auth/authController";
+
 const useStyles = createStyles(({ token }) => {
   return {
     action: {
@@ -52,23 +50,13 @@ const useStyles = createStyles(({ token }) => {
     },
   };
 });
-const ActionIcons = () => {
-  const { styles } = useStyles();
-  return (
-    <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
-      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
-    </>
-  );
-};
-const Lang = () => {
-  const { styles } = useStyles();
-  return;
-};
-const LoginMessage: React.FC<{
-  content: string;
-}> = ({ content }) => {
+
+/**
+ * 登陆表单提示信息
+ * @param content
+ * @constructor
+ */
+const LoginMessage: React.FC<{ content: string; }> = ({ content }) => {
   return (
     <Alert
       style={{
@@ -80,10 +68,20 @@ const LoginMessage: React.FC<{
     />
   );
 };
+
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
-  const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const [
+    CURR_USER_INFO,         // 当前用户信息（状态管理）
+    updateCurrentUserInfo   // 更新用户信息的函数
+  ] = useState<API.AuthResponse>({});
+  const [
+    LOGIN_TYPE,
+    updateLoginType
+  ] = useState<string>('account');
+  const {
+    initialState,           // 当前应用的全局初始状态对象
+    setInitialState         // 更新全局状态的函数
+  } = useModel('@@initialState');
   const { styles } = useStyles();
   const { message } = App.useApp();
   const fetchUserInfo = async () => {
@@ -97,31 +95,37 @@ const Login: React.FC = () => {
       });
     }
   };
-  const handleSubmit = async (values: API.LoginParams) => {
+  const handleSubmit = async (values: API.LoginReq) => {
     try {
       // 登录
-      const msg = await login({
+      const rst = await login({
         ...values,
-        type,
       });
-      if (msg.status === 'ok') {
-        const defaultLoginSuccessMessage = '登录成功！';
-        message.success(defaultLoginSuccessMessage);
+      if (rst.code === 200) {
+        message.success('登录成功！');
+        if (rst.data?.token) {
+          localStorage.setItem('token', rst.data.token);
+        } else {
+          message.error('登录失败：服务端未返回token');
+          return;
+        }
+        // 获取用户信息
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         window.location.href = urlParams.get('redirect') || '/';
         return;
       }
-      console.log(msg);
+      console.log("登陆响应结果：", rst);
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+      // @ts-ignore
+      updateCurrentUserInfo(undefined);
     } catch (error) {
       const defaultLoginFailureMessage = '登录失败，请重试！';
       console.log(error);
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { status, type: loginType } = userLoginState;
+  const { account, rolesList } = CURR_USER_INFO;
   return (
     <div className={styles.container}>
       <Helmet>
@@ -147,14 +151,13 @@ const Login: React.FC = () => {
           initialValues={{
             autoLogin: true,
           }}
-          // actions={['其他登录方式 :', <ActionIcons key="icons" />]}
           onFinish={async (values) => {
-            await handleSubmit(values as API.LoginParams);
+            await handleSubmit(values as API.LoginReq);
           }}
         >
           <Tabs
-            activeKey={type}
-            onChange={setType}
+            activeKey={LOGIN_TYPE}
+            onChange={updateLoginType}
             centered
             items={[
               {
@@ -164,13 +167,13 @@ const Login: React.FC = () => {
             ]}
           />
 
-          {status === 'error' && loginType === 'account' && (
-            <LoginMessage content={'错误的用户名和密码(admin/ant.design)'} />
-          )}
-          {type === 'account' && (
+          {/*{account === undefined && LOGIN_TYPE === 'account' && (*/}
+          {/*  <LoginMessage content={'错误的用户名和密码(admin/ant.design)'} />*/}
+          {/*)}*/}
+          {LOGIN_TYPE === 'account' && (
             <>
               <ProFormText
-                name="username"
+                name="account"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,

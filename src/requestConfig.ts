@@ -19,12 +19,17 @@ interface ResponseStructure {
   showType?: ErrorShowType;
 }
 
+// 获取token的函数（根据实际存储位置调整）
+const getToken = () => {
+  return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+};
+
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
  * @doc https://umijs.org/docs/max/request#配置
  */
-export const errorConfig: RequestConfig = {
+export const requestConfig: RequestConfig = {
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
@@ -88,9 +93,24 @@ export const errorConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
-      // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token=123');
-      return { ...config, url };
+      // 1. 获取token
+      const token = getToken();
+      // 2. 如果存在token，添加Authorization头
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+      }
+      // 3. 可选：添加时间戳防止缓存
+      const url = config.url;
+      if (url && url.indexOf('?') === -1) {
+        config.url = `${url}?_t=${Date.now()}`;
+      } else if (url) {
+        config.url = `${url}&_t=${Date.now()}`;
+      }
+      // 4. 返回修改后的配置
+      return config;
     },
   ],
 
