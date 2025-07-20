@@ -2,20 +2,20 @@
 /* eslint-disable */
 import { request } from "@umijs/max";
 
-/** 此处后端没有提供注释 POST /public/gene-secret-key */
+/** 此处后端没有提供注释 POST /auth/gene-secret-key */
 export async function geneSecretKey(options?: { [key: string]: any }) {
-  return request<API.ApiResponseString>("/public/gene-secret-key", {
+  return request<API.ApiResponseString>("/auth/gene-secret-key", {
     method: "POST",
     ...(options || {}),
   });
 }
 
-/** 此处后端没有提供注释 POST /public/login */
+/** 此处后端没有提供注释 POST /auth/login */
 export async function login(
   body: API.LoginReq,
   options?: { [key: string]: any }
 ) {
-  return request<API.ApiResponseAuthResponse>("/public/login", {
+  return request<API.ApiResponseAuthResponse>("/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,28 +25,28 @@ export async function login(
   });
 }
 
-/** 此处后端没有提供注释 POST /public/logout */
+/** 此处后端没有提供注释 POST /auth/logout */
 export async function logout(options?: { [key: string]: any }) {
-  return request<API.ApiResponseVoid>("/public/logout", {
+  return request<API.ApiResponseVoid>("/auth/logout", {
     method: "POST",
     ...(options || {}),
   });
 }
 
-/** 此处后端没有提供注释 POST /public/refresh-token */
+/** 此处后端没有提供注释 POST /auth/refresh-token */
 export async function refreshToken(options?: { [key: string]: any }) {
-  return request<API.ApiResponseAuthResponse>("/public/refresh-token", {
+  return request<API.ApiResponseAuthResponse>("/auth/refresh-token", {
     method: "POST",
     ...(options || {}),
   });
 }
 
-/** 此处后端没有提供注释 POST /public/register */
+/** 此处后端没有提供注释 POST /auth/register */
 export async function register(
   body: API.RegisterReq,
   options?: { [key: string]: any }
 ) {
-  return request<API.ApiResponseAuthResponse>("/public/register", {
+  return request<API.ApiResponseAuthResponse>("/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

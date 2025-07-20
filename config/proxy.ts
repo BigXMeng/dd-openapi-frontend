@@ -1,43 +1,33 @@
-/**
- * @name 代理的配置
- * @see 在生产环境 代理是无法生效的，所以这里没有生产环境的配置
- * -------------------------------
- * The agent cannot take effect in the production environment
- * so there is no configuration of the production environment
- * For details, please see
- * https://pro.ant.design/docs/deploy
- *
- * @doc https://umijs.org/docs/guides/proxy
- */
+// config/proxy.ts
 export default {
-  // 如果需要自定义本地开发服务器  请取消注释按需调整
-  // dev: {
-  //   // localhost:8000/api/** -> https://preview.pro.ant.design/api/**
-  //   '/api/': {
-  //     // 要代理的地址
-  //     target: 'https://preview.pro.ant.design',
-  //     // 配置了这个可以从 http 代理到 https
-  //     // 依赖 origin 的功能可能需要这个，比如 cookie
-  //     changeOrigin: true,
-  //   },
-  // },
-  /**
-   * @name 详细的代理配置
-   * @doc https://github.com/chimurai/http-proxy-middleware
-   */
+  dev: {
+    // 认证服务代理
+    '/auth-api/': {
+      target: 'http://localhost:10066',
+      changeOrigin: true,
+      pathRewrite: { '^/auth-api': '/auth-service' },
+    },
+
+    // 订单服务代理
+    '/api-api/': {
+      target: 'http://localhost:8002',
+      changeOrigin: true,
+      pathRewrite: { '^/api-api': '/order-service' },
+    },
+  },
+
+  // 测试环境配置
   test: {
-    // localhost:8000/api/** -> https://preview.pro.ant.design/api/**
-    '/api/': {
-      target: 'https://proapi.azurewebsites.net',
+    '/auth-api/': {
+      target: 'https://test-auth.example.com',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: { '^/auth-api': '' },
     },
+    // 其他服务类似配置...
   },
+
+  // 生产环境配置
   pre: {
-    '/api/': {
-      target: 'your pre url',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
-  },
+    // 通常生产环境不使用代理，直接配置网关地址
+  }
 };

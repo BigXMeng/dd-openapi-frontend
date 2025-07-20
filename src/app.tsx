@@ -1,16 +1,19 @@
-import {AvatarDropdown, AvatarName, Footer} from '@/components';
-import {LinkOutlined} from '@ant-design/icons';
-import type {Settings as LayoutSettings} from '@ant-design/pro-components';
-import {SettingDrawer} from '@ant-design/pro-components';
+import {SettingDrawer, Settings as LayoutSettings} from '@ant-design/pro-components';
 import '@ant-design/v5-patch-for-react-19';
-import type {RequestConfig, RunTimeLayoutConfig} from '@umijs/max';
-import {history, Link} from '@umijs/max';
+import {Link, RequestConfig,} from '@umijs/max';
+import {history} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
-import {requestConfig} from './requestConfig';
 import {refreshToken} from "@/services/dd-ms-auth/authController";
+import {RequestOptions} from '@umijs/max';
+import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
+import {AvatarDropdown, AvatarName, Footer} from "@/components";
+import {LinkOutlined} from "@ant-design/icons";
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+
+// 后端服务类型定义
+type ServiceType = 'auth' | 'api';
 
 /**
  * @return 返回一个 Promise，解析值为指定类型的对象
@@ -88,11 +91,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
     links: isDev
       ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-            <span>OpenAPI 文档</span>
-          </Link>,
-        ]
+        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+          <LinkOutlined />
+          <span>OpenAPI 文档</span>
+        </Link>,
+      ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
@@ -123,12 +126,58 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
   };
 };
 
-/**
- * @name request 配置，可以配置错误处理
- * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
- * @doc https://umijs.org/docs/max/request#配置
- */
+// @ts-ignore
 export const request: RequestConfig = {
-  baseURL: 'http://localhost:10066/auth',
-  ...requestConfig,
+  // 注意：开发环境不要设置 baseURL，使用代理前缀
+  baseURL: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_GATEWAY : undefined,
+
+  errorConfig: {
+    // 全局错误处理配置
+  },
+  // 请求拦截器
+  requestInterceptors: [
+    (config: RequestOptions) => {
+      console.log("当前请求的url为：", config.url);
+      // 动态设置服务URL
+      const url = config.url;
+      const service = detectServiceFromUrl(url);
+      console.log("当前请求的service为：", service);
+      if (service) {
+        config.url = getServiceBaseURL(service) + config.url;
+        console.log("修改后的url为：", config.url);
+      }
+      // 添加认证令牌
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+      }
+      return config;
+    },
+  ],
+
+  // 响应拦截器
+  responseInterceptors: [
+
+  ]
 };
+
+// 获取服务基础URL
+const getServiceBaseURL = (service: ServiceType) => {
+  if (process.env.NODE_ENV === 'development') {
+    // 开发环境使用代理前缀
+    return `/${service}-api`;
+  }
+  // 生产环境使用环境变量配置
+  return process.env[`REACT_APP_${service.toUpperCase()}_API`] || '';
+};
+
+// 辅助函数：根据URL识别服务类型
+function detectServiceFromUrl(url?: string): ServiceType | null {
+  if (!url) return null;
+  if (url.startsWith('/auth')) return 'auth';
+  if (url.startsWith('/api')) return 'api';
+  return null;
+}
