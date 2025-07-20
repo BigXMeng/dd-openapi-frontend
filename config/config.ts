@@ -144,8 +144,8 @@ export default defineConfig({
   openAPI: [
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'https://gw.alipayobjects.com/os/antfincdn/CA1dOm%2631B/openapi.json',
-      projectName: 'swagger',
+      schemaPath: 'http://localhost:10066/auth/v3/api-docs',
+      projectName: 'dd-ms-auth',
     },
   ],
   mock: {
