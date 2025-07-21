@@ -11,8 +11,8 @@ import * as userRolesRelController from "./userRolesRelController";
 export default {
   userRolesRelController,
   rolePermissionsRelController,
-  authController,
   deptUsersRelController,
+  authController,
   enumController,
   apiResourceController,
 };

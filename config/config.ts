@@ -144,7 +144,7 @@ export default defineConfig({
   openAPI: [
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:10066/auth/v3/api-docs',
+      schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
       projectName: 'dd-ms-auth',
     },
   ],
