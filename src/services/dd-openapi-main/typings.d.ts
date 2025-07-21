@@ -34,6 +34,10 @@ declare namespace API {
     userId: number;
   };
 
+  type InterfaceInfoDeleteReq = {
+    ids: number[];
+  };
+
   type InterfaceInfoDO = {
     id?: number;
     name?: string;
@@ -101,9 +105,9 @@ declare namespace API {
   type IPageInterfaceInfoVO = {
     size?: number;
     total?: number;
+    records?: InterfaceInfoVO[];
     current?: number;
     pages?: number;
-    records?: InterfaceInfoVO[];
   };
 
   type PageParams = {

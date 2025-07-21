@@ -32,6 +32,21 @@ export async function addBatchMp(
   });
 }
 
+/** 此处后端没有提供注释 DELETE /interface/delete */
+export async function deleteUsingDelete(
+  body: API.InterfaceInfoDeleteReq,
+  options?: { [key: string]: any }
+) {
+  return request<API.ApiResponseVoid>("/interface/delete", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 POST /interface/page */
 export async function page(
   body: API.InterfaceInfoQueryReq,

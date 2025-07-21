@@ -13,7 +13,7 @@ const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
 // 后端服务类型定义
-type ServiceType = 'auth' | 'api';
+type ServiceType = 'auth' | 'interface';
 
 /**
  * @return 返回一个 Promise，解析值为指定类型的对象
@@ -178,6 +178,6 @@ const getServiceBaseURL = (service: ServiceType) => {
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
   if (url.startsWith('/auth')) return 'auth';
-  if (url.startsWith('/api')) return 'api';
+  if (url.startsWith('/interface')) return 'interface';
   return null;
 }

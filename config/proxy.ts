@@ -9,10 +9,10 @@ export default {
     },
 
     // 订单服务代理
-    '/api-api/': {
+    '/interface-api/': {
       target: 'http://localhost:18011',
       changeOrigin: true,
-      pathRewrite: { '^/api-api': '/dd-openapi-main' },
+      pathRewrite: { '^/interface-api': '/dd-openapi-main' },
     },
   },
 
