@@ -142,10 +142,15 @@ export default defineConfig({
    * @doc https://pro.ant.design/zh-cn/docs/openapi/
    */
   openAPI: [
+    // {
+    //   requestLibPath: "import { request } from '@umijs/max'",
+    //   schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
+    //   projectName: 'dd-ms-auth',
+    // },
     {
       requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
-      projectName: 'dd-ms-auth',
+      schemaPath: 'http://localhost:18011/dd-openapi-main/v3/api-docs',
+      projectName: 'dd-openapi-main',
     },
   ],
   mock: {
