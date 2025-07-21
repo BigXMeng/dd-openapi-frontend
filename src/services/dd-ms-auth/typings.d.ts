@@ -11,10 +11,22 @@ declare namespace API {
     data?: Record<string, any>;
   };
 
+  type ApiResponseRefreshTokenResponse = {
+    code?: number;
+    message?: string;
+    data?: RefreshTokenResponse;
+  };
+
   type ApiResponseString = {
     code?: number;
     message?: string;
     data?: string;
+  };
+
+  type ApiResponseUserInfoVO = {
+    code?: number;
+    message?: string;
+    data?: UserInfoVO;
   };
 
   type ApiResponseVoid = {
@@ -24,13 +36,12 @@ declare namespace API {
   };
 
   type AuthResponse = {
-    token?: string;
+    accessToken?: string;
     refreshToken?: string;
     account?: string;
-    userRealName?: string;
     userAvatar?: string;
-    rolesList?: string[];
-    rolesVOList?: RoleVO[];
+    expiresIn?: number;
+    tokenType?: string;
   };
 
   type DeptUsesRelAddReq = {
@@ -52,6 +63,12 @@ declare namespace API {
     perOpLevel?: string;
     perParentId?: number;
     appId?: number;
+  };
+
+  type RefreshTokenResponse = {
+    accessToken?: string;
+    refreshToken?: string;
+    expiresIn?: number;
   };
 
   type RegisterReq = {
@@ -114,6 +131,17 @@ declare namespace API {
     jsonEditor?: boolean;
     showRequestHeaders?: boolean;
     supportedSubmitMethods?: string[];
+  };
+
+  type UserInfoVO = {
+    userId?: number;
+    account?: string;
+    userRealName?: string;
+    userAvatar?: string;
+    contactInfo?: string;
+    status?: string;
+    rolesList?: string[];
+    rolesVOList?: RoleVO[];
   };
 
   type UserRolesBatchAddReq = {

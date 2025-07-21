@@ -33,14 +33,6 @@ export async function logout(options?: { [key: string]: any }) {
   });
 }
 
-/** 此处后端没有提供注释 POST /auth/refresh-token */
-export async function refreshToken(options?: { [key: string]: any }) {
-  return request<API.ApiResponseAuthResponse>("/auth/refresh-token", {
-    method: "POST",
-    ...(options || {}),
-  });
-}
-
 /** 此处后端没有提供注释 POST /auth/register */
 export async function register(
   body: API.RegisterReq,
@@ -52,6 +44,22 @@ export async function register(
       "Content-Type": "application/json",
     },
     data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 POST /auth/token-refresh */
+export async function refreshToken(options?: { [key: string]: any }) {
+  return request<API.ApiResponseRefreshTokenResponse>("/auth/token-refresh", {
+    method: "POST",
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 POST /auth/user-info */
+export async function userInfo(options?: { [key: string]: any }) {
+  return request<API.ApiResponseUserInfoVO>("/auth/user-info", {
+    method: "POST",
     ...(options || {}),
   });
 }

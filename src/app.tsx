@@ -3,7 +3,7 @@ import '@ant-design/v5-patch-for-react-19';
 import {Link, RequestConfig,} from '@umijs/max';
 import {history} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
-import {refreshToken} from "@/services/dd-ms-auth/authController";
+import {refreshToken, userInfo} from "@/services/dd-ms-auth/authController";
 import {RequestOptions} from '@umijs/max';
 import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
 import {AvatarDropdown, AvatarName, Footer} from "@/components";
@@ -20,12 +20,12 @@ type ServiceType = 'auth' | 'api';
  */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>; // 默认配置组件 config/defaultSettings.ts
-  currentUser?: API.AuthResponse;
-  fetchUserInfo?: () => Promise<API.AuthResponse | undefined>;
+  currentUser?: API.UserInfoVO;
+  fetchUserInfo?: () => Promise<API.UserInfoVO | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const rst = await refreshToken();
+      const rst = await userInfo();
       return rst.data;
     } catch (_error) {
       history.push(loginPath);

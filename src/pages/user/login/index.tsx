@@ -73,7 +73,7 @@ const Login: React.FC = () => {
   const [
     CURR_USER_INFO,         // 当前用户信息（状态管理）
     updateCurrentUserInfo   // 更新用户信息的函数
-  ] = useState<API.AuthResponse>({});
+  ] = useState<API.UserInfoVO>({});
   const [
     LOGIN_TYPE,
     updateLoginType
@@ -102,9 +102,9 @@ const Login: React.FC = () => {
         ...values,
       });
       if (rst.code === 200) {
-        message.success('登录成功！');
-        if (rst.data?.token) {
-          localStorage.setItem('token', rst.data.token);
+        if (rst.data?.accessToken) {
+          message.success('登录成功！');
+          localStorage.setItem('token', rst.data.accessToken);
         } else {
           message.error('登录失败：服务端未返回token');
           return;
