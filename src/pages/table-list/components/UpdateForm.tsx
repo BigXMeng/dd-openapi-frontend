@@ -1,183 +1,130 @@
-import { updateRule } from '@/services/ant-design-pro/api';
-import {
-  ProFormDateTimePicker,
-  ProFormRadio,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  StepsForm,
-} from '@ant-design/pro-components';
-import { useRequest } from '@umijs/max';
-import { Modal, message } from 'antd';
-import React, { cloneElement, useCallback, useState } from 'react';
-export type FormValueType = {
-  target?: string;
-  template?: string;
-  type?: string;
-  time?: string;
-  frequency?: string;
-} & Partial<API.RuleListItem>;
-export type UpdateFormProps = {
-  trigger?: React.ReactElement<any>;
-  onOk?: () => void;
-  values: Partial<API.RuleListItem>;
-};
-const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-  const { onOk, values, trigger } = props;
-  const [open, setOpen] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-  const { run } = useRequest(updateRule, {
-    manual: true,
-    onSuccess: () => {
-      messageApi.success('Configuration is successful');
-      onOk?.();
-    },
-    onError: () => {
-      messageApi.error('Configuration failed, please try again!');
-    },
-  });
-  const onCancel = useCallback(() => {
-    setOpen(false);
-  }, []);
-  const onOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
-  const onFinish = useCallback(
-    async (values?: any) => {
-      await run({
-        data: values,
-      });
-      onCancel();
-    },
-    [onCancel, run],
-  );
-  return (
-    <>
-      {contextHolder}
-      {trigger
-        ? cloneElement(trigger, {
-            onClick: onOpen,
-          })
-        : null}
-      <StepsForm
-        stepsProps={{
-          size: 'small',
-        }}
-        stepsFormRender={(dom, submitter) => {
-          return (
-            <Modal
-              width={640}
-              bodyStyle={{
-                padding: '32px 40px 48px',
-              }}
-              destroyOnClose
-              title={'规则配置'}
-              open={open}
-              footer={submitter}
-              onCancel={onCancel}
-            >
-              {dom}
-            </Modal>
-          );
-        }}
-        onFinish={onFinish}
-      >
-        <StepsForm.StepForm initialValues={values} title={'基本信息'}>
-          <ProFormText
-            name="name"
-            label={'规则名称'}
-            width="md"
-            rules={[
-              {
-                required: true,
-                message: '请输入规则名称！',
-              },
-            ]}
-          />
-          <ProFormTextArea
-            name="desc"
-            width="md"
-            label={'规则描述'}
-            placeholder={'请输入至少五个字符'}
-            rules={[
-              {
-                required: true,
-                message: '请输入至少五个字符的规则描述！',
-                min: 5,
-              },
-            ]}
-          />
-        </StepsForm.StepForm>
-        <StepsForm.StepForm
-          initialValues={{
-            target: '0',
-            template: '0',
-          }}
-          title={'配置规则属性'}
+/* CreateForm.tsx
+ * 新建接口表单组件
+ * 功能：点击「新建」按钮弹出 Modal 表单，填写接口信息后提交到后端 /interface/add 接口
+ * 依赖：@ant-design/pro-components、@umijs/max、react、antd
+ */
+
+// 业务接口：真正向后端发送新增接口请求的函数
+import {update} from '@/services/dd-openapi-main/interfaceInfoController';
+// Ant Design 图标
+// ProComponents 表单控件
+import {ModalForm} from "@ant-design/pro-form";
+import {ProFormSelect, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
+// Umi 封装的 useRequest，用于发请求、管理 loading、错误处理
+import {useRequest} from '@umijs/max';
+// Ant Design 基础组件
+import {Form} from 'antd';
+import React, {FC} from 'react';
+
+interface UpdateFormProps {
+    /** 当前行数据，用于回填 */
+    values: API.InterfaceInfoVO;
+    /** 编辑成功后刷新表格 */
+    reload?: () => void;
+    /** 触发元素，默认“编辑”链接 */
+    trigger?: React.ReactNode;
+}
+
+const UpdateForm: FC<UpdateFormProps> = ({values, reload, trigger}) => {
+    /* ----------------- 表单实例 ----------------- */
+    const [form] = Form.useForm<API.InterfaceInfoUpdateReq>();
+
+    /* ----------------- 请求逻辑 ----------------- */
+    // 编辑接口
+    const {run, loading} = useRequest(update, {
+        manual: true,
+        onSuccess: () => {
+            reload?.();        // 刷新表格
+        },
+    });
+
+    /* ----------------- 渲染 ----------------- */
+    return (
+        <ModalForm<API.InterfaceInfoUpdateReq>
+            title="编辑接口"
+            /* 触发器：支持自定义，默认“编辑” */
+            trigger={trigger ?? <a>编辑</a>}
+            form={form}
+            width={600}
+            /* 打开弹窗时把当前行数据写进表单 */
+            modalProps={{
+                destroyOnHidden: true,  // 关闭即销毁，防止旧数据残留
+            }}
+            onOpenChange={(open) => {
+                if (open) {
+                    // 打开时回填；注意字段名要和表单一致
+                    form.setFieldsValue({
+                        name: values.name,
+                        description: values.description,
+                        url: values.url,
+                        method: values.method,
+                        requestParams: values.requestParams,
+                        requestHeader: values.requestHeader,
+                        responseHeader: values.responseHeader,
+                        status: values.status,
+                    });
+                }
+            }}
+            onFinish={async (formData) => {
+                /* 合并 id 后提交 */
+                await run({...formData, id: values.id});
+                return true;   // 关闭弹窗
+            }}
         >
-          <ProFormSelect
-            name="target"
-            width="md"
-            label={'监控对象'}
-            valueEnum={{
-              0: '表一',
-              1: '表二',
-            }}
-          />
-          <ProFormSelect
-            name="template"
-            width="md"
-            label={'规则模板'}
-            valueEnum={{
-              0: '规则模板一',
-              1: '规则模板二',
-            }}
-          />
-          <ProFormRadio.Group
-            name="type"
-            label={'规则类型'}
-            options={[
-              {
-                value: '0',
-                label: '强',
-              },
-              {
-                value: '1',
-                label: '弱',
-              },
-            ]}
-          />
-        </StepsForm.StepForm>
-        <StepsForm.StepForm
-          initialValues={{
-            type: '1',
-            frequency: 'month',
-          }}
-          title={'设定调度周期'}
-        >
-          <ProFormDateTimePicker
-            name="time"
-            width="md"
-            label={'开始时间'}
-            rules={[
-              {
-                required: true,
-                message: '请选择开始时间！',
-              },
-            ]}
-          />
-          <ProFormSelect
-            name="frequency"
-            label={'监控对象'}
-            width="md"
-            valueEnum={{
-              month: '月',
-              week: '周',
-            }}
-          />
-        </StepsForm.StepForm>
-      </StepsForm>
-    </>
-  );
+            {/* 以下字段与新增保持一致，回填时会自动赋值 */}
+            <ProFormText
+                name="name"
+                label="接口名称"
+                rules={[{required: true, message: '接口名称不能为空'}]}
+            />
+            <ProFormTextArea
+                name="description"
+                label="接口描述"
+                rows={3}
+            />
+            <ProFormText
+                name="url"
+                label="接口地址"
+                rules={[{required: true, message: '接口地址不能为空'}]}
+            />
+            <ProFormSelect
+                name="method"
+                label="请求方法"
+                valueEnum={{
+                    GET: 'GET',
+                    POST: 'POST',
+                    PUT: 'PUT',
+                    DELETE: 'DELETE',
+                }}
+                rules={[{required: true, message: '必须选择请求方法'}]}
+            />
+            <ProFormTextArea
+                name="requestParams"
+                label="请求参数"
+                rules={[{required: true, message: '请输入请求参数'}]}
+                rows={4}
+            />
+            <ProFormTextArea
+                name="requestHeader"
+                label="请求头"
+                rows={3}
+            />
+            <ProFormTextArea
+                name="responseHeader"
+                label="响应头"
+                rows={3}
+            />
+            <ProFormSelect
+                name="status"
+                label="接口状态"
+                valueEnum={{
+                    0: '关闭',
+                    1: '运行中',
+                }}
+                rules={[{required: true, message: '必须选择接口状态'}]}
+            />
+        </ModalForm>
+    );
 };
+
 export default UpdateForm;

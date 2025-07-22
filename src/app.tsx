@@ -1,10 +1,8 @@
 import {SettingDrawer, Settings as LayoutSettings} from '@ant-design/pro-components';
 import '@ant-design/v5-patch-for-react-19';
-import {Link, RequestConfig,} from '@umijs/max';
-import {history} from '@umijs/max';
+import {history, Link, RequestConfig, RequestOptions,} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
-import {refreshToken, userInfo} from "@/services/dd-ms-auth/authController";
-import {RequestOptions} from '@umijs/max';
+import {userInfo} from "@/services/dd-ms-auth/authController";
 import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
 import {AvatarDropdown, AvatarName, Footer} from "@/components";
 import {LinkOutlined} from "@ant-design/icons";
@@ -131,10 +129,7 @@ export const request: RequestConfig = {
   // 注意：开发环境不要设置 baseURL，使用代理前缀
   baseURL: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_GATEWAY : undefined,
 
-  errorConfig: {
-    // 全局错误处理配置
-  },
-  // 请求拦截器
+  // 1 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
       console.log("当前请求的url为：", config.url);
@@ -158,10 +153,33 @@ export const request: RequestConfig = {
     },
   ],
 
-  // 响应拦截器
+  // 2 响应拦截器（新增）
   responseInterceptors: [
+    // 第一个拦截器：统一解析后端返回格式
+    (response) => {
+      return response; // 直接透传，不修改返回值
+    },
+  ],
 
-  ]
+  // 3 统一错误处理（可选）
+  errorConfig: {
+    errorThrower: (res) => {
+      // 如果后端返回的 code !== 0 就抛出错误
+      const { code, message: msg } = res as { code: number; message: string; data: any };
+      if (code >= 300) {
+        throw new Error(msg || 'Request Error');
+      }
+    },
+    errorHandler: (error: any, opts: any) => {
+      // 这里是全局错误提示
+      if (opts?.skipErrorHandler) return;
+      const { message: msg } = error;
+      // 使用 antd App 的 message（如果已包 App）
+      // import { message } from 'antd';
+      // message.error(msg);
+      console.error(msg);
+    },
+  },
 };
 
 // 获取服务基础URL

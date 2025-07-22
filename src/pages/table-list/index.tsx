@@ -1,43 +1,25 @@
-import { removeRule, rule } from '@/services/ant-design-pro/api';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import {
-  FooterToolbar,
-  PageContainer,
-  ProDescriptions,
-  ProTable,
-} from '@ant-design/pro-components';
-import { useRequest } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
-import React, { useCallback, useRef, useState } from 'react';
+import type {ActionType, ProColumns} from '@ant-design/pro-components';
+import {FooterToolbar, PageContainer, ProTable,} from '@ant-design/pro-components';
+import {App, Button} from 'antd';
+import React, {useCallback, useRef, useState} from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 import {deleteUsingDelete, page} from "@/services/dd-openapi-main/interfaceInfoController";
+
 const TableList: React.FC = () => {
+  const {message} = App.useApp();   // ← 不再从 antd 直接引入
   const actionRef = useRef<ActionType | null>(null);
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [interfaceRow, setInterfaceRow] = useState<API.InterfaceInfoVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfoVO[]>([]);
 
-  const [messageApi, contextHolder] = message.useMessage();
-  const { run: delRun, loading } = useRequest(removeRule, {
-    manual: true,
-    onSuccess: () => {
-      setSelectedRows([]);
-      actionRef.current?.reloadAndRest?.();
-      messageApi.success('Deleted successfully and will refresh soon');
-    },
-    onError: () => {
-      messageApi.error('Delete failed, please try again');
-    },
-  });
   const columns: ProColumns<API.InterfaceInfoVO>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
-      key: 'id',
       search: false, // 不在查询表单显示
       hideInForm: true, // 不在表单中显示（如果使用ModalForm）
-      hideInTable: false // 明确在表格中显示（默认值，可省略）
+      hideInTable: true // 明确在表格中显示（默认值，可省略）
     },
     {
       title: '接口名称',
@@ -119,16 +101,12 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => [
         <UpdateForm
-          trigger={<a>配置</a>}
-          key="config"
-          onOk={actionRef.current?.reload}
-          values={record}
+          key="edit"
+          values={record}                 // 把当前行数据传进去
+          reload={actionRef.current?.reload}
         />,
-        // <a key="subscribeAlert" href="https://procomponents.ant.design/">
-        //   订阅警报
-        // </a>,
       ],
-    },
+    }
   ];
 
   /**
@@ -149,11 +127,10 @@ const TableList: React.FC = () => {
           ids: selectedRows.map(row => row.id).filter(Boolean) as number[] // 过滤掉可能的 undefined
         };
         await deleteUsingDelete(deleteRequest);
-        message.success('删除成功');
         actionRef.current?.reload(); // 刷新表格
         setSelectedRows([]); // 清空选中状态
+        message.success(`成功删除 ${selectedRows.length} 条数据`);
       } catch (error) {
-        message.error('删除失败');
       }
     },
     [deleteUsingDelete, actionRef, message]
@@ -161,11 +138,11 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      {contextHolder}
+      {/*{contextHolder}*/}
       <ProTable<API.InterfaceInfoVO>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
@@ -215,48 +192,25 @@ const TableList: React.FC = () => {
                 {selectedRowsState.length}
               </a>{' '}
               项 &nbsp;&nbsp;
-              <span>
-                服务调用次数总计{' '}
-                {selectedRowsState.reduce((pre, item) => pre + (item.userId ?? 0), 0)} 万
-              </span>
+              {/*<span>*/}
+              {/*  服务调用次数总计{' '}*/}
+              {/*  {selectedRowsState.reduce((pre, item) => pre + (item.userId ?? 0), 0)} 万*/}
+              {/*</span>*/}
             </div>
           }
         >
           <Button
-            loading={loading}
+            color="danger"
+            variant="solid"
+            type={'primary'}
             onClick={() => {
               handleRemove(selectedRowsState);
             }}
           >
             批量删除
           </Button>
-          <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
-
-      {/*<Drawer*/}
-      {/*  width={600}*/}
-      {/*  open={showDetail}*/}
-      {/*  onClose={() => {*/}
-      {/*    setInterfaceRow(undefined);*/}
-      {/*    setShowDetail(false);*/}
-      {/*  }}*/}
-      {/*  closable={false}*/}
-      {/*>*/}
-      {/*  {interfaceRow?.name && (*/}
-      {/*    <ProDescriptions<API.InterfaceInfoVO>*/}
-      {/*      column={2}*/}
-      {/*      title={interfaceRow?.name}*/}
-      {/*      request={async () => ({*/}
-      {/*        data: interfaceRow || {},*/}
-      {/*      })}*/}
-      {/*      params={{*/}
-      {/*        id: interfaceRow?.name,*/}
-      {/*      }}*/}
-      {/*      columns={columns as ProDescriptionsItemProps<API.InterfaceInfoVO>[]}*/}
-      {/*    />*/}
-      {/*  )}*/}
-      {/*</Drawer>*/}
     </PageContainer>
   );
 };
