@@ -95,7 +95,7 @@ declare namespace API {
     responseHeader?: string;
     status?: number;
     method?: string;
-    userId?: number;
+    userAccount?: string;
     userName?: string;
     createTime?: string;
     updateTime?: string;

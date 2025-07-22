@@ -1,5 +1,5 @@
-import { GithubOutlined } from '@ant-design/icons';
-import { DefaultFooter } from '@ant-design/pro-components';
+import {SmileTwoTone} from '@ant-design/icons';
+import {DefaultFooter} from '@ant-design/pro-components';
 import React from 'react';
 
 const Footer: React.FC = () => {
@@ -11,21 +11,15 @@ const Footer: React.FC = () => {
       copyright="dev by liuxianmeng"
       links={[
         {
-          key: 'Ant Design Pro',
-          title: 'Ant Design Pro',
-          href: 'https://pro.ant.design',
+          key: 'Blog',
+          title: <SmileTwoTone/>,
+          href: 'https://blog.bigbigmeng.online/',
           blankTarget: true,
         },
         {
-          key: 'github',
-          title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
-          blankTarget: true,
-        },
-        {
-          key: 'Ant Design',
-          title: 'Ant Design',
-          href: 'https://ant.design',
+          key: 'I‘m Here',
+          title: 'I‘m Here',
+          href: 'https://blog.bigbigmeng.online',
           blankTarget: true,
         },
       ]}

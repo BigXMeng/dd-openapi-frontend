@@ -44,7 +44,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建人',
-      dataIndex: 'userId',
+      dataIndex: 'userAccount',
       valueType: 'textarea',
     },
     {

@@ -71,7 +71,6 @@ const CreateForm: FC<CreateFormProps> = ({ reload }) => {
          */
         const payload: API.InterfaceInfoAddReq = {
           ...values,
-          userId: 1, // TODO: 改成从 Redux、localStorage、token 等获取
         };
         // 调用 useRequest 返回的 run 函数
         await run(payload);
