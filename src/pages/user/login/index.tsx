@@ -101,21 +101,25 @@ const Login: React.FC = () => {
       const rst = await login({
         ...values,
       });
-      if (rst.code === 200) {
+      console.log("登陆响应结果：", rst);
+      if (rst.code === 200 || rst.code === 201) {
+        console.log("提示登陆成功：", '登录成功！持续2秒');
+        message.success('登录成功！', 1500);
         if (rst.data?.accessToken) {
-          message.success('登录成功！');
           localStorage.setItem('token', rst.data.accessToken);
         } else {
           message.error('登录失败：服务端未返回token');
           return;
         }
-        // 获取用户信息
-        await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        window.location.href = urlParams.get('redirect') || '/';
+        // 延迟 1 秒跳转
+        setTimeout(async () => {
+          // 获取用户信息
+          await fetchUserInfo();
+          const urlParams = new URL(window.location.href).searchParams;
+          window.location.href = urlParams.get('redirect') || '/';
+        }, 1500);
         return;
       }
-      console.log("登陆响应结果：", rst);
       // 如果失败去设置用户错误信息
       // @ts-ignore
       updateCurrentUserInfo(undefined);
