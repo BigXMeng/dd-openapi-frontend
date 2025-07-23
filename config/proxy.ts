@@ -7,7 +7,6 @@ export default {
       changeOrigin: true,
       pathRewrite: { '^/auth-api': '/auth-service' },
     },
-
     // 订单服务代理
     '/interface-api/': {
       target: 'http://localhost:18011',

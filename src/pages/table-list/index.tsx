@@ -151,6 +151,7 @@ const TableList: React.FC = () => {
           // 构造符合 InterfaceInfoQueryReq 的请求参数
           const requestBody: API.InterfaceInfoQueryReq = {
             pageParams: {
+              // @ts-ignore
               pageNum: params.current,
               pageSize: params.pageSize,
             },

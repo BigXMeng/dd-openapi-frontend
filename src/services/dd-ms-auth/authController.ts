@@ -55,11 +55,3 @@ export async function refreshToken(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
-
-/** 此处后端没有提供注释 POST /auth/user-info */
-export async function userInfo(options?: { [key: string]: any }) {
-  return request<API.ApiResponseUserInfoVO>("/auth/user-info", {
-    method: "POST",
-    ...(options || {}),
-  });
-}

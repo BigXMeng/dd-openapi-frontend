@@ -137,7 +137,7 @@ export default defineConfig({
   //================ pro 插件配置 =================
   presets: ['umi-presets-pro'],
   /**
-   * @name openAPI 插件的配置
+   * @name openAPI 插件的配置 TODO 用完即时注释
    * @description 基于 openapi 的规范生成serve 和mock，能减少很多样板代码
    * @doc https://pro.ant.design/zh-cn/docs/openapi/
    */
@@ -147,11 +147,11 @@ export default defineConfig({
     //   schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
     //   projectName: 'dd-ms-auth',
     // },
-    {
-      requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:18011/dd-openapi-main/v3/api-docs',
-      projectName: 'dd-openapi-main',
-    },
+    // {
+    //   requestLibPath: "import { request } from '@umijs/max'",
+    //   schemaPath: 'http://localhost:18011/dd-openapi-main/v3/api-docs',
+    //   projectName: 'dd-openapi-main',
+    // },
   ],
   mock: {
     include: ['mock/**/*', 'src/pages/**/_mock.ts'],

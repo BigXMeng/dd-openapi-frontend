@@ -73,7 +73,7 @@ const Login: React.FC = () => {
   const [
     CURR_USER_INFO,         // 当前用户信息（状态管理）
     updateCurrentUserInfo   // 更新用户信息的函数
-  ] = useState<API.UserInfoVO>({});
+  ] = useState<API.UserVO>({});
   const [
     LOGIN_TYPE,
     updateLoginType

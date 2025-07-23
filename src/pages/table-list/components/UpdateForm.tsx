@@ -67,7 +67,8 @@ const UpdateForm: FC<UpdateFormProps> = ({values, reload, trigger}) => {
             }}
             onFinish={async (formData) => {
                 /* 合并 id 后提交 */
-                await run({...formData, id: values.id});
+                // @ts-ignore
+              await run({...formData, id: values.id});
                 return true;   // 关闭弹窗
             }}
         >

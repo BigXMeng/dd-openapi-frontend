@@ -2,7 +2,7 @@ import {SettingDrawer, Settings as LayoutSettings} from '@ant-design/pro-compone
 import '@ant-design/v5-patch-for-react-19';
 import {history, Link, RequestConfig, RequestOptions,} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
-import {userInfo} from "@/services/dd-ms-auth/authController";
+import {getUserInfoByToken} from "@/services/dd-ms-auth/userInfoController";
 import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
 import {AvatarDropdown, AvatarName, Footer} from "@/components";
 import {LinkOutlined} from "@ant-design/icons";
@@ -18,12 +18,12 @@ type ServiceType = 'auth' | 'interface';
  */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>; // 默认配置组件 config/defaultSettings.ts
-  currentUser?: API.UserInfoVO;
-  fetchUserInfo?: () => Promise<API.UserInfoVO | undefined>;
+  currentUser?: API.UserVO;
+  fetchUserInfo?: () => Promise<API.UserVO | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const rst = await userInfo();
+      const rst = await getUserInfoByToken();
       return rst.data;
     } catch (_error) {
       history.push(loginPath);
@@ -195,7 +195,7 @@ const getServiceBaseURL = (service: ServiceType) => {
 // 辅助函数：根据URL识别服务类型
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
-  if (url.startsWith('/auth')) return 'auth';
+  if (url.startsWith('/auth') || url.startsWith('/user/info')) return 'auth';
   if (url.startsWith('/interface')) return 'interface';
   return null;
 }

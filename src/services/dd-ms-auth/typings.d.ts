@@ -23,10 +23,10 @@ declare namespace API {
     data?: string;
   };
 
-  type ApiResponseUserInfoVO = {
+  type ApiResponseUserVO = {
     code?: number;
     message?: string;
-    data?: UserInfoVO;
+    data?: UserVO;
   };
 
   type ApiResponseVoid = {
@@ -91,6 +91,10 @@ declare namespace API {
     permissions?: PermissionVO[];
   };
 
+  type secretKeyParams = {
+    accessKey: string;
+  };
+
   type SecurityConfiguration = {
     apiKey?: string;
     apiKeyVehicle?: string;
@@ -133,8 +137,12 @@ declare namespace API {
     supportedSubmitMethods?: string[];
   };
 
-  type UserInfoVO = {
+  type UserRolesBatchAddReq = {
     userId?: number;
+    roleIds?: number[];
+  };
+
+  type UserVO = {
     account?: string;
     userRealName?: string;
     userAvatar?: string;
@@ -142,10 +150,5 @@ declare namespace API {
     status?: string;
     rolesList?: string[];
     rolesVOList?: RoleVO[];
-  };
-
-  type UserRolesBatchAddReq = {
-    userId?: number;
-    roleIds?: number[];
   };
 }

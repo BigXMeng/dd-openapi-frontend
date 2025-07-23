@@ -7,8 +7,10 @@ import * as authController from "./authController";
 import * as deptUsersRelController from "./deptUsersRelController";
 import * as enumController from "./enumController";
 import * as rolePermissionsRelController from "./rolePermissionsRelController";
+import * as userInfoController from "./userInfoController";
 import * as userRolesRelController from "./userRolesRelController";
 export default {
+  userInfoController,
   userRolesRelController,
   rolePermissionsRelController,
   deptUsersRelController,
