@@ -11,7 +11,7 @@ export default {
     '/interface-api/': {
       target: 'http://localhost:18011',
       changeOrigin: true,
-      pathRewrite: { '^/interface-api': '/dd-openapi-main' },
+      pathRewrite: { '^/interface-api': '/dd-openapi-main-web' },
     },
   },
 

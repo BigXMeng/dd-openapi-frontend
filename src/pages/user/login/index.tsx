@@ -1,19 +1,14 @@
-import { Footer } from '@/components';
-import {
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { Helmet, useModel } from '@umijs/max';
-import { Alert, App, Tabs } from 'antd';
-import { createStyles } from 'antd-style';
-import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
+import {Footer} from '@/components';
+import {LockOutlined, UserOutlined,} from '@ant-design/icons';
+import {LoginForm, ProFormText,} from '@ant-design/pro-components';
+import {App, Button, Tabs} from 'antd';
+import {createStyles} from 'antd-style';
+import React, {useState} from 'react';
+import {flushSync} from 'react-dom';
+import {useModel} from 'umi';
+import {login, register} from "@/services/dd-ms-auth/authController";
 import Settings from '../../../../config/defaultSettings';
-import {login} from "@/services/dd-ms-auth/authController";
+import {Helmet} from "@@/exports";
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -51,39 +46,22 @@ const useStyles = createStyles(({ token }) => {
   };
 });
 
-/**
- * 登陆表单提示信息
- * @param content
- * @constructor
- */
-const LoginMessage: React.FC<{ content: string; }> = ({ content }) => {
-  return (
-    <Alert
-      style={{
-        marginBottom: 24,
-      }}
-      message={content}
-      type="error"
-      showIcon
-    />
-  );
-};
-
 const Login: React.FC = () => {
   const [
-    CURR_USER_INFO,         // 当前用户信息（状态管理）
+    currentUserInfo,        // 当前用户信息（状态管理）
     updateCurrentUserInfo   // 更新用户信息的函数
-  ] = useState<API.UserVO>({});
+  ] = useState<API.UserVO>({} as API.UserVO);
   const [
-    LOGIN_TYPE,
-    updateLoginType
-  ] = useState<string>('account');
+    operationType,
+    updateOperationType
+  ] = useState<string>('login');
   const {
     initialState,           // 当前应用的全局初始状态对象
     setInitialState         // 更新全局状态的函数
   } = useModel('@@initialState');
   const { styles } = useStyles();
   const { message } = App.useApp();
+
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
     if (userInfo) {
@@ -95,16 +73,17 @@ const Login: React.FC = () => {
       });
     }
   };
+
   const handleSubmit = async (values: API.LoginReq) => {
     try {
       // 登录
       const rst = await login({
         ...values,
       });
-      console.log("登陆响应结果：", rst);
+      console.log("登录响应结果：", rst);
       if (rst.code === 200 || rst.code === 201) {
-        console.log("提示登陆成功：", '登录成功！持续2秒');
-        message.success('登录成功！', 1500);
+        console.log("提示登录成功：", '登录成功！持续2秒');
+        message.success('登录成功！', 500);
         if (rst.data?.accessToken) {
           localStorage.setItem('token', rst.data.accessToken);
         } else {
@@ -117,7 +96,7 @@ const Login: React.FC = () => {
           await fetchUserInfo();
           const urlParams = new URL(window.location.href).searchParams;
           window.location.href = urlParams.get('redirect') || '/';
-        }, 1500);
+        }, 500);
         return;
       }
       // 如果失败去设置用户错误信息
@@ -129,12 +108,34 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-  const { account, rolesList } = CURR_USER_INFO;
+
+  const handleRegister = async (values: API.RegisterReq) => {
+    try {
+      // 注册
+      const rst = await register({
+        ...values,
+      });
+      console.log("注册响应结果：", rst);
+      if (rst.code === 200 || rst.code === 201) {
+        console.log("提示注册成功：", '注册成功！持续2秒');
+        message.success('注册成功！');
+        updateOperationType("login"); // 注册成功后切换回登录模式
+        return;
+      }
+      message.error('注册失败，请重试！');
+    } catch (error) {
+      const defaultRegisterFailureMessage = '注册失败，请重试！';
+      console.log(error);
+      message.error(defaultRegisterFailureMessage);
+    }
+  };
+
   return (
     <div className={styles.container}>
+      {/*页面头部信息*/}
       <Helmet>
         <title>
-          {'登录'}
+          {'登录 | 注册'}
           {Settings.title && ` - ${Settings.title}`}
         </title>
       </Helmet>
@@ -143,7 +144,7 @@ const Login: React.FC = () => {
           flex: '1',
           padding: '32px 0',
         }}
-      >
+      > {/*submitter-自定义组件*/}
         <LoginForm
           contentStyle={{
             minWidth: 280,
@@ -156,25 +157,39 @@ const Login: React.FC = () => {
             autoLogin: true,
           }}
           onFinish={async (values) => {
-            await handleSubmit(values as API.LoginReq);
+            if (operationType === 'register') {
+              await handleRegister(values as API.RegisterReq);
+            } else {
+              await handleSubmit(values as API.LoginReq);
+            }
+          }}
+          submitter={{
+            render: (_, dom) => {
+              return (
+                <Button type="primary" htmlType="submit" size="large" style={{ width: '100%' }}>
+                  {operationType === 'register' ? '注册' : '登录'}
+                </Button>
+              );
+            }
           }}
         >
           <Tabs
-            activeKey={LOGIN_TYPE}
-            onChange={updateLoginType}
+            activeKey={operationType}
+            onChange={updateOperationType} // updateOperationType函数更新的值就是下面列表的key：login|register
             centered
             items={[
               {
-                key: 'account',
+                key: 'login',
                 label: '账户密码登录',
+              },
+              {
+                key: 'register',
+                label: '用户注册',
               },
             ]}
           />
 
-          {/*{account === undefined && LOGIN_TYPE === 'account' && (*/}
-          {/*  <LoginMessage content={'错误的用户名和密码(admin/ant.design)'} />*/}
-          {/*)}*/}
-          {LOGIN_TYPE === 'account' && (
+          {operationType === 'login' && (
             <>
               <ProFormText
                 name="account"
@@ -182,7 +197,40 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
-                placeholder={'用户名: admin or user'}
+                placeholder={'用户名: liuxianmeng | user'}
+                rules={[
+                  {
+                    required: true,
+                    message: '用户名是必填项！',
+                  },
+                ]}
+              />
+              <ProFormText.Password
+                name="password"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined/>,
+                }}
+                placeholder={'密码: 123!@#qwe'}
+                rules={[
+                  {
+                    required: true,
+                    message: '密码是必填项！',
+                  },
+                ]}
+              />
+            </>
+          )}
+
+          {operationType === 'register' && (
+            <>
+              <ProFormText
+                name="account"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined/>,
+                }}
+                placeholder={'用户名: 不小于4位，如：Lucy'}
                 rules={[
                   {
                     required: true,
@@ -196,7 +244,7 @@ const Login: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder={'密码: ant.design'}
+                placeholder={'密码: 不小于8位，如：123!@#qwe'}
                 rules={[
                   {
                     required: true,
@@ -212,4 +260,5 @@ const Login: React.FC = () => {
     </div>
   );
 };
+
 export default Login;
