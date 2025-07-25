@@ -15,7 +15,18 @@ export default [
       { path: '/admin/sub-page', name: '二级管理页', component: './Admin' },
     ],
   },
-  { name: '查询表格', icon: 'table', path: '/list', component: './table-list' },
+  {
+    name: 'API接口列表',
+    icon: 'table',
+    path: '/interface/list',
+    component: './table-list',
+  },
+  {
+    name: '接口在线调试',
+    icon: 'table',
+    path: '/interface/debug',
+    component: './table-list/debug',
+  },
   { path: '/', redirect: '/welcome' },
   { path: '*', layout: false, component: './404' },
 ];

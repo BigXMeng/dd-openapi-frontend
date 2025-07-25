@@ -1,0 +1,64 @@
+// index.less
+.api-debug-page {
+  .api-info-card,
+  .request-config-card,
+  .response-card {
+    margin-bottom: 24px;
+  }
+
+  .request-config-card {
+    .ant-tabs-nav {
+      margin-bottom: 16px;
+    }
+
+    .ant-tabs-tab-disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  .response-status {
+    padding: 8px 16px;
+
+    .status-label {
+      display: inline-block;
+      width: 80px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+
+    .status-code {
+      font-weight: bold;
+
+      &.success {
+        color: #52c41a;
+      }
+
+      &.warning {
+        color: #faad14;
+      }
+
+      &.error {
+        color: #f5222d;
+      }
+    }
+
+    .status-value {
+      font-weight: bold;
+    }
+  }
+
+  .ant-pro-form-list-container {
+    .ant-pro-form-list-item {
+      display: flex;
+      margin-bottom: 16px;
+
+      .ant-space {
+        width: 100%;
+      }
+    }
+
+    .ant-pro-form-list-action {
+      margin-top: 8px;
+    }
+  }
+}
