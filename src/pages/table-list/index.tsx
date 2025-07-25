@@ -1,6 +1,6 @@
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {FooterToolbar, PageContainer, ProTable,} from '@ant-design/pro-components';
-import {App, Button} from 'antd';
+import {App, Button, Modal} from 'antd';
 import React, {useCallback, useRef, useState} from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
@@ -12,6 +12,31 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [interfaceRow, setInterfaceRow] = useState<API.InterfaceInfoVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfoVO[]>([]);
+
+  function handleDelete(record: API.InterfaceInfoVO) {
+    // 弹出确认模态框
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除【' + record.name + '】这个接口吗？',
+      onOk: async () => {
+        try {
+          const deleteRequest: API.InterfaceInfoDeleteReq = {ids: [record.id]};
+          await deleteUsingDelete(deleteRequest);
+          actionRef.current?.reload(); // 刷新表格
+          message.success(`成功删除 1 条数据`);
+        } catch (error) {
+          message.error(`删除失败：${error instanceof Error ? error.message : '未知错误'}`);
+        }
+      },
+      onCancel: () => {
+        console.log('取消删除');
+      },
+    });
+  }
+
+  function handleDebug(record: API.InterfaceInfoVO) {
+
+  }
 
   const columns: ProColumns<API.InterfaceInfoVO>[] = [
     {
@@ -102,9 +127,15 @@ const TableList: React.FC = () => {
       render: (_, record) => [
         <UpdateForm
           key="edit"
-          values={record}                 // 把当前行数据传进去
+          values={record} // 把当前行数据传进去
           reload={actionRef.current?.reload}
         />,
+        <a key="debug" onClick={() => handleDebug(record)}>
+          在线调试
+        </a>,
+        <a key="delete" onClick={() => handleDelete(record)} style={{color: 'red'}}>
+          删除
+        </a>,
       ],
     }
   ];
@@ -131,6 +162,7 @@ const TableList: React.FC = () => {
         setSelectedRows([]); // 清空选中状态
         message.success(`成功删除 ${selectedRows.length} 条数据`);
       } catch (error) {
+        message.error(`删除失败`);
       }
     },
     [deleteUsingDelete, actionRef, message]

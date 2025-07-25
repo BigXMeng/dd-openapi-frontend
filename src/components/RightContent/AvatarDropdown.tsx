@@ -1,4 +1,4 @@
-import {LogoutOutlined, SettingOutlined, UserOutlined,} from '@ant-design/icons';
+import {ApiOutlined, LogoutOutlined, SettingOutlined, UserOutlined,} from '@ant-design/icons';
 import {history, useModel} from '@umijs/max';
 import type {MenuProps} from 'antd';
 import {message, Spin} from 'antd';
@@ -38,6 +38,8 @@ const useStyles = createStyles(({ token }) => {
 });
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children,}) => {
+  menu = true;
+
   /** 真正的退出登录逻辑 */
   const logoutS = async () => {
     try {
@@ -54,7 +56,6 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
         setInitialState((s) => ({...s, currentUser: undefined}));
         localStorage.removeItem("token")
       });
-
       // 4️⃣ 记录当前地址用于登录后回跳
       const {pathname, search} = window.location;
       history.replace({
@@ -84,23 +85,28 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
   if (!initialState?.currentUser?.account) return loading;
 
   const menuItems: MenuProps['items'] = [
-    ...(menu
-      ? [
-          {
-            key: 'center',
-            icon: <UserOutlined />,
-            label: '个人中心',
-          },
-          {
-            key: 'settings',
-            icon: <SettingOutlined />,
-            label: '个人设置',
-          },
-          {
-            type: 'divider' as const,
-          },
-        ]
-      : []),
+    // ...(menu
+    //   ? [
+    //       {
+    //         key: 'center',
+    //         icon: <UserOutlined />,
+    //         label: '个人中心',
+    //       },
+    //       {
+    //         key: 'settings',
+    //         icon: <SettingOutlined />,
+    //         label: '个人设置',
+    //       },
+    //       {
+    //         type: 'divider' as const,
+    //       },
+    //     ]
+    //   : []),
+    {
+      key: 'settings',
+      icon: <ApiOutlined />,
+      label: 'API密钥获取',
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,

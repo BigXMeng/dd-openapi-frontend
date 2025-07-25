@@ -195,7 +195,7 @@ const Login: React.FC = () => {
                 name="account"
                 fieldProps={{
                   size: 'large',
-                  prefix: <UserOutlined />,
+                  prefix: <UserOutlined />
                 }}
                 placeholder={'用户名: liuxianmeng | user'}
                 rules={[
@@ -209,7 +209,7 @@ const Login: React.FC = () => {
                 name="password"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined/>,
+                  prefix: <LockOutlined/>
                 }}
                 placeholder={'密码: 123!@#qwe'}
                 rules={[
