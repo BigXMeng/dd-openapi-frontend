@@ -170,7 +170,7 @@ export default {
       status: 500,
       error: 'error',
       message: 'error',
-      path: '/base/category/list',
+      path: '/base/category/AdminList',
     });
   },
   'GET /api/404': (_req: Request, res: Response) => {
@@ -179,7 +179,7 @@ export default {
       status: 404,
       error: 'Not Found',
       message: 'No message available',
-      path: '/base/category/list/2121212',
+      path: '/base/category/AdminList/2121212',
     });
   },
   'GET /api/403': (_req: Request, res: Response) => {
@@ -188,7 +188,7 @@ export default {
       status: 403,
       error: 'Forbidden',
       message: 'Forbidden',
-      path: '/base/category/list',
+      path: '/base/category/AdminList',
     });
   },
   'GET /api/401': (_req: Request, res: Response) => {
@@ -197,7 +197,7 @@ export default {
       status: 401,
       error: 'Unauthorized',
       message: 'Unauthorized',
-      path: '/base/category/list',
+      path: '/base/category/AdminList',
     });
   },
 

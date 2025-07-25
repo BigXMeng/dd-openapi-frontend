@@ -1,42 +1,32 @@
-import { SendOutlined } from '@ant-design/icons';
+import {SendOutlined} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   ProForm,
   ProFormDependency,
-  ProFormField,
-  ProFormGroup,
   ProFormList,
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-components';
-import {
-  Button,
-  Col,
-  Collapse,
-  Input,
-  message,
-  Row,
-  Select,
-  Space,
-  Tabs,
-  Typography,
-} from 'antd';
-import React, { useEffect, useState } from 'react';
+import {Button, Col, Collapse, Input, message, Row, Space, Tabs, Typography} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {useLocation} from 'umi';
 import JsonView from 'react-json-view';
 import './index.less';
+import {get} from '@/services/dd-openapi-main/interfaceInfoController';
+import {ProFormGroup} from "@ant-design/pro-form/lib";
+import {ProFormField} from "@ant-design/pro-form";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
-const API_DEBUG_URL = '/api/debug'; // 后端调试接口地址
-
 const ApiDebugPage = () => {
+  const location = useLocation();
   const [responseData, setResponseData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('params');
-  const [apiInfo, setApiInfo] = useState<any>({
+  const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({
     name: '用户查询接口',
     description: '用于查询用户信息的接口',
     url: '/api/user/{id}',
@@ -64,38 +54,32 @@ const ApiDebugPage = () => {
       const requestData = {
         ...apiInfo,
         ...values,
-        requestParams: values.requestParams
-          ? JSON.stringify(values.requestParams)
-          : '{}',
-        requestHeader: values.requestHeader
-          ? JSON.stringify(values.requestHeader)
-          : '{}',
+        requestParams: values.requestParams ? JSON.stringify(values.requestParams) : '{}',
+        requestHeader: values.requestHeader ? values.requestHeader : {}
       };
-
       // 模拟请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
+      await new Promise(resolve => setTimeout(resolve, 800));
       // 模拟响应数据
       const mockResponse = {
         status: 200,
         data: {
           id: 12345,
-          name: '张三',
-          email: 'zhangsan@example.com',
-          roles: ['admin', 'user'],
-          createdAt: '2023-01-15T10:30:00Z',
+          name: "张三",
+          email: "zhangsan@example.com",
+          roles: ["admin", "user"],
+          createdAt: "2023-01-15T10:30:00Z",
           active: true,
           profile: {
             age: 28,
-            location: '北京市朝阳区',
-          },
+            location: "北京市朝阳区"
+          }
         },
         headers: {
-          'Content-Type': 'application/json',
-          'X-RateLimit-Limit': '1000',
-          'X-RateLimit-Remaining': '997',
+          "Content-Type": "application/json",
+          "X-RateLimit-Limit": "1000",
+          "X-RateLimit-Remaining": "997"
         },
-        responseTime: 156,
+        responseTime: 156
       };
 
       setResponseData(mockResponse);
@@ -105,20 +89,41 @@ const ApiDebugPage = () => {
       console.error('Debug error:', error);
       setResponseData({
         status: 500,
-        error: '请求失败，请检查网络连接或API配置',
+        error: "请求失败，请检查网络连接或API配置"
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // 初始化请求参数
+  // 获取接口ID并调用详情接口
   useEffect(() => {
-    const initialValues = {
-      requestParams: parseJsonString(apiInfo.requestParams),
-      requestHeader: parseJsonString(apiInfo.requestHeader),
+    const fetchInterfaceData = async () => {
+      try {
+        setLoading(true);
+        // 从路由参数获取接口ID
+        const interfaceId = location.pathname.split('/').pop();
+        if (!interfaceId) {
+          throw new Error('未获取到接口ID');
+        }
+        // 调用get方法获取接口详情
+        const response = await get(interfaceId);
+        console.log("/interface-api/interface/get/id rst = ", response);
+        if (response.code === 200) {
+          setApiInfo(response.data);
+        } else {
+          throw new Error(response.message || '获取接口详情失败');
+        }
+      } catch (err) {
+        console.error('获取接口详情失败:', err);
+        // @ts-ignore
+        message.error(err.message || '获取接口详情失败');
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
+    fetchInterfaceData();
+  }, [location]);
 
   return (
     <PageContainer
@@ -126,7 +131,7 @@ const ApiDebugPage = () => {
       header={{
         title: (
           <Title level={2} style={{ margin: 0 }}>
-            {apiInfo.name} API在线调试
+            {apiInfo.name}
           </Title>
         ),
         breadcrumb: {},
@@ -144,8 +149,8 @@ const ApiDebugPage = () => {
               name="name"
               label="接口名称"
               readonly
-              initialValue={apiInfo.name}
               fieldProps={{
+                value: apiInfo.name, // 绑定到 apiInfo.name
                 placeholder: '接口名称',
               }}
             />
@@ -155,7 +160,9 @@ const ApiDebugPage = () => {
               name="method"
               label="请求方式"
               readonly
-              initialValue={apiInfo.method}
+              fieldProps={{
+                value: apiInfo.method, // 绑定到 apiInfo.method
+              }}
               valueEnum={{
                 GET: { text: 'GET', status: 'Success' },
                 POST: { text: 'POST', status: 'Processing' },
@@ -170,8 +177,8 @@ const ApiDebugPage = () => {
               name="description"
               label="接口描述"
               readonly
-              initialValue={apiInfo.description}
               fieldProps={{
+                value: apiInfo.description, // 绑定到 apiInfo.description
                 placeholder: '接口描述',
               }}
             />
@@ -181,11 +188,32 @@ const ApiDebugPage = () => {
               name="url"
               label="接口地址"
               readonly
-              initialValue={apiInfo.url}
               fieldProps={{
+                value: apiInfo.url, // 绑定到 apiInfo.url
                 placeholder: '接口地址',
               }}
             />
+          </Col>
+          <Col span={24}>
+            <ProCard
+              bordered
+              headerBordered
+              className="request-params-card"
+            >
+              <div className="request-params-title">
+                <Title level={4}>请求参数描述</Title>
+              </div>
+              <pre style={{
+                padding: 16,
+                borderRadius: 4,
+                backgroundColor: '#2a2a2a',
+                color: '#fff',
+                fontSize: '14px',
+                whiteSpace: 'pre-wrap'
+              }}>
+      {apiInfo.requestParams}
+    </pre>
+            </ProCard>
           </Col>
         </Row>
       </ProCard>
@@ -226,7 +254,7 @@ const ApiDebugPage = () => {
                 <TabPane
                   tab="请求参数"
                   key="params"
-                  disabled={method === 'GET' ? false : true}
+                  disabled={method !== 'GET'}
                 >
                   {method === 'GET' ? (
                     <ProFormGroup>
@@ -265,7 +293,7 @@ const ApiDebugPage = () => {
                 <TabPane
                   tab="请求体"
                   key="body"
-                  disabled={method === 'GET' ? true : false}
+                  disabled={method === 'GET'}
                 >
                   {method !== 'GET' ? (
                     <ProFormField name="requestParams" label="请求体内容">
@@ -292,18 +320,21 @@ const ApiDebugPage = () => {
                     creatorButtonProps={{
                       creatorButtonText: '添加请求头',
                     }}
-                  >
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                      <Row gutter={16}>
-                        <Col span={8}>
-                          <ProFormText name="key" label="Header名称" />
-                        </Col>
-                        <Col span={16}>
-                          <ProFormText name="value" label="Header值" />
-                        </Col>
-                      </Row>
-                    </Space>
-                  </ProFormList>
+                    itemRender={({listDom, action}) => (
+                      <Space direction="vertical" style={{width: '100%'}}>
+                        <Row gutter={16}>
+                          <Col span={8}>
+                            <ProFormText name="key" label="Header名称"/>
+                          </Col>
+                          <Col span={16}>
+                            <ProFormText name="value" label="Header值"/>
+                          </Col>
+                        </Row>
+                        {listDom}
+                        {action}
+                      </Space>
+                    )}
+                  />
                 </TabPane>
               </Tabs>
             )}

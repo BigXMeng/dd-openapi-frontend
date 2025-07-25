@@ -1,10 +1,11 @@
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {FooterToolbar, PageContainer, ProTable,} from '@ant-design/pro-components';
 import {App, Button, Modal} from 'antd';
+import { history } from 'umi';
 import React, {useCallback, useRef, useState} from 'react';
-import CreateForm from './components/CreateForm';
-import UpdateForm from './components/UpdateForm';
 import {deleteUsingDelete, page} from "@/services/dd-openapi-main/interfaceInfoController";
+import UpdateForm from "@/pages/interface/components/UpdateForm";
+import CreateForm from "@/pages/interface/components/CreateForm";
 
 const TableList: React.FC = () => {
   const {message} = App.useApp();   // ← 不再从 antd 直接引入
@@ -20,6 +21,7 @@ const TableList: React.FC = () => {
       content: '确定要删除【' + record.name + '】这个接口吗？',
       onOk: async () => {
         try {
+          // @ts-ignore
           const deleteRequest: API.InterfaceInfoDeleteReq = {ids: [record.id]};
           await deleteUsingDelete(deleteRequest);
           actionRef.current?.reload(); // 刷新表格
@@ -34,9 +36,12 @@ const TableList: React.FC = () => {
     });
   }
 
-  function handleDebug(record: API.InterfaceInfoVO) {
-
-  }
+  const handleDebug = (record: API.InterfaceInfoVO) => {
+    // 跳转到调试页面，携带接口数据作为状态
+    history.push({
+      pathname: `/interface/debug/${record.id}`,
+    });
+  };
 
   const columns: ProColumns<API.InterfaceInfoVO>[] = [
     {
@@ -89,8 +94,8 @@ const TableList: React.FC = () => {
       dataIndex: 'status',
       valueType: 'select',
       valueEnum: {
-        0: { text: '关闭', status: 'Error' },
-        1: { text: '运行中', status: 'Success' },
+        0: {text: '下线', status: 'Error'},
+        1: {text: '上线', status: 'Success'},
       },
     },
     // {

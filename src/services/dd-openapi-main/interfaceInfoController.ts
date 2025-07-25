@@ -17,6 +17,12 @@ export async function add(
   });
 }
 
+export async function get(id: string | number) {
+  return request<API.InterfaceInfoVO>(`/interface/get/${id}`, {
+    method: "GET",
+  });
+}
+
 /** 此处后端没有提供注释 POST /interface/add/batch/mp */
 export async function addBatchMp(
   body: API.InterfaceInfoDO[],

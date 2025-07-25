@@ -102,6 +102,11 @@ declare namespace API {
     isDelete?: number;
   };
 
+  // 在 typings.d.ts 中定义路由状态类型
+  declare interface LocationState {
+    interfaceData?: API.InterfaceInfoVO;
+  }
+
   type IPageInterfaceInfoVO = {
     size?: number;
     total?: number;

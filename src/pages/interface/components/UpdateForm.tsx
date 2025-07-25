@@ -119,8 +119,8 @@ const UpdateForm: FC<UpdateFormProps> = ({values, reload, trigger}) => {
                 name="status"
                 label="接口状态"
                 valueEnum={{
-                    0: '关闭',
-                    1: '运行中',
+                    0: '下线',
+                    1: '上线',
                 }}
                 rules={[{required: true, message: '必须选择接口状态'}]}
             />
