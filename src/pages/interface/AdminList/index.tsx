@@ -3,7 +3,7 @@ import {FooterToolbar, PageContainer, ProTable,} from '@ant-design/pro-component
 import {App, Button, Modal} from 'antd';
 import { history } from 'umi';
 import React, {useCallback, useRef, useState} from 'react';
-import {deleteUsingDelete, page} from "@/services/dd-openapi-main/interfaceInfoController";
+import {deleteUsingDelete, page} from "@/services/dd-openapi-main/apiInfoController";
 import UpdateForm from "@/pages/interface/components/UpdateForm";
 import CreateForm from "@/pages/interface/components/CreateForm";
 

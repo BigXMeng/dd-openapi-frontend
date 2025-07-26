@@ -25,6 +25,15 @@ export async function login(
   });
 }
 
+export async function getCurrentUserInfo() {
+  return request<API.ApiResponseUserVO>("/user/info", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 /** 此处后端没有提供注释 POST /auth/logout */
 export async function logout(options?: { [key: string]: any }) {
   return request<API.ApiResponseVoid>("/auth/logout", {

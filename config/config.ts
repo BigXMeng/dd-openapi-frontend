@@ -140,6 +140,12 @@ export default defineConfig({
    * @name openAPI 插件的配置 TODO 用完即时注释
    * @description 基于 openapi 的规范生成serve 和mock，能减少很多样板代码
    * @doc https://pro.ant.design/zh-cn/docs/openapi/
+    后端需要引入依赖：
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-ui</artifactId>
+        <version>1.7.0</version> <!-- 检查最新版本 -->
+     </dependency>
    */
   openAPI: [
     // {
@@ -149,7 +155,7 @@ export default defineConfig({
     // },
     // {
     //   requestLibPath: "import { request } from '@umijs/max'",
-    //   schemaPath: 'http://localhost:18011/dd-openapi-main/v3/api-docs',
+    //   schemaPath: 'http://localhost:18011/dd-openapi-main-web/v3/api-docs',
     //   projectName: 'dd-openapi-main',
     // },
   ],

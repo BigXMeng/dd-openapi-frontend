@@ -6,7 +6,7 @@ import {createStyles} from 'antd-style';
 import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useModel} from 'umi';
-import {login, register} from "@/services/dd-ms-auth/authController";
+import {getCurrentUserInfo, login, register} from "@/services/dd-ms-auth/authController";
 import Settings from '../../../../config/defaultSettings';
 import {Helmet} from "@@/exports";
 
@@ -48,10 +48,6 @@ const useStyles = createStyles(({ token }) => {
 
 const Login: React.FC = () => {
   const [
-    currentUserInfo,        // 当前用户信息（状态管理）
-    updateCurrentUserInfo   // 更新用户信息的函数
-  ] = useState<API.UserVO>({} as API.UserVO);
-  const [
     operationType,
     updateOperationType
   ] = useState<string>('login');
@@ -90,18 +86,21 @@ const Login: React.FC = () => {
           message.error('登录失败：服务端未返回token');
           return;
         }
+        // 获取用户信息
+        const rstUserInfo = await getCurrentUserInfo();
+        // @ts-ignore
+        const currentUserVO:API.UserVO = rstUserInfo.data;
+        // @ts-ignore
+        currentUserVO.rolesVOList = null;
+        console.log("currentUserVO = ", currentUserVO);
+        localStorage.setItem('accessKey', JSON.stringify(currentUserVO.accessKey));
         // 延迟 1 秒跳转
         setTimeout(async () => {
-          // 获取用户信息
-          await fetchUserInfo();
           const urlParams = new URL(window.location.href).searchParams;
           window.location.href = urlParams.get('redirect') || '/';
         }, 500);
         return;
       }
-      // 如果失败去设置用户错误信息
-      // @ts-ignore
-      updateCurrentUserInfo(undefined);
     } catch (error) {
       const defaultLoginFailureMessage = '登录失败，请重试！';
       console.log(error);

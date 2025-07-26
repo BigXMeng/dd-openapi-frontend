@@ -150,5 +150,6 @@ declare namespace API {
     status?: string;
     rolesList?: string[];
     rolesVOList?: RoleVO[];
+    accessKey?: string;
   };
 }

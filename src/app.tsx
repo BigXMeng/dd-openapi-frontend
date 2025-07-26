@@ -6,18 +6,13 @@ import {getUserInfoByToken} from "@/services/dd-ms-auth/userInfoController";
 import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
 import {AvatarDropdown, AvatarName, Footer} from "@/components";
 import {LinkOutlined} from "@ant-design/icons";
+import {useModel} from "umi";
 
-const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+const isDev = process.env.NODE_ENV === 'development';
 
-// 后端服务类型定义
-type ServiceType = 'auth' | 'interface';
-
-/**
- * @return 返回一个 Promise，解析值为指定类型的对象
- */
 export async function getInitialState(): Promise<{
-  settings?: Partial<LayoutSettings>; // 默认配置组件 config/defaultSettings.ts
+  settings?: Partial<LayoutSettings>;
   currentUser?: API.UserVO;
   fetchUserInfo?: () => Promise<API.UserVO | undefined>;
 }> {
@@ -30,7 +25,6 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // 如果不是登录页面，执行
   const { location } = history;
   if (![loginPath, '/user/register', '/user/register-result'].includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
@@ -141,13 +135,39 @@ export const request: RequestConfig = {
         config.url = getServiceBaseURL(service) + config.url;
         console.log("修改后的url为：", config.url);
       }
+
+      if(url == '/auth/login') {
+        return config;
+      }
+
       // 添加认证令牌
       const token = localStorage.getItem('token');
       if (token) {
+        console.log("请求拦截，添加请求头Authorization：", `Bearer ${token}`)
         config.headers = {
           ...config.headers,
           Authorization: `Bearer ${token}`,
         };
+      }
+
+      if(url == '/user/info' || url == '/auth/logout') {
+        return config;
+      }
+
+      try {
+        // 从localStorage中读取用户信息
+        const accessKey = localStorage.getItem('accessKey');
+        console.log("请求拦截，添加请求头accessKey：", accessKey);
+        if (accessKey) {
+          if (accessKey) {
+            config.headers = {
+              ...config.headers,
+              'X-Access-Key': accessKey,
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error adding apiKey headers:', error);
       }
       return config;
     },
@@ -182,6 +202,9 @@ export const request: RequestConfig = {
   },
 };
 
+// 后端服务类型定义
+type ServiceType = 'auth' | 'interfaceInfo' | 'apiInvoke';
+
 // 获取服务基础URL
 const getServiceBaseURL = (service: ServiceType) => {
   if (process.env.NODE_ENV === 'development') {
@@ -196,6 +219,7 @@ const getServiceBaseURL = (service: ServiceType) => {
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
   if (url.startsWith('/auth') || url.startsWith('/user/info')) return 'auth';
-  if (url.startsWith('/interface')) return 'interface';
+  if (url.startsWith('/interface')) return 'interfaceInfo';
+  if (url.startsWith('/ui-client')) return 'apiInvoke';
   return null;
 }

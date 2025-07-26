@@ -1,7 +1,6 @@
 import {ApiOutlined, LogoutOutlined, SettingOutlined, UserOutlined,} from '@ant-design/icons';
 import {history, useModel} from '@umijs/max';
-import type {MenuProps} from 'antd';
-import {message, Spin} from 'antd';
+import {MenuProps, message, Spin} from 'antd';
 import {createStyles} from 'antd-style';
 import React from 'react';
 import {flushSync} from 'react-dom';

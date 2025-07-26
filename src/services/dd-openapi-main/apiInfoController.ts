@@ -17,27 +17,6 @@ export async function add(
   });
 }
 
-export async function get(id: string | number) {
-  return request<API.InterfaceInfoVO>(`/interface/get/${id}`, {
-    method: "GET",
-  });
-}
-
-/** 此处后端没有提供注释 POST /interface/add/batch/mp */
-export async function addBatchMp(
-  body: API.InterfaceInfoDO[],
-  options?: { [key: string]: any }
-) {
-  return request<API.ApiResponseVoid>("/interface/add/batch/mp", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** 此处后端没有提供注释 DELETE /interface/delete */
 export async function deleteUsingDelete(
   body: API.InterfaceInfoDeleteReq,
@@ -50,6 +29,12 @@ export async function deleteUsingDelete(
     },
     data: body,
     ...(options || {}),
+  });
+}
+
+export async function get(id: string | number) {
+  return request<API.ApiResponseInterfaceInfoVO>(`/interface/get/${id}`, {
+    method: "GET",
   });
 }
 

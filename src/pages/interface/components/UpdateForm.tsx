@@ -5,7 +5,7 @@
  */
 
 // 业务接口：真正向后端发送新增接口请求的函数
-import {update} from '@/services/dd-openapi-main/interfaceInfoController';
+import {update} from '@/services/dd-openapi-main/apiInfoController';
 // Ant Design 图标
 // ProComponents 表单控件
 import {ModalForm} from "@ant-design/pro-form";

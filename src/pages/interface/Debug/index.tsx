@@ -13,9 +13,11 @@ import React, {useEffect, useState} from 'react';
 import {useLocation} from 'umi';
 import JsonView from 'react-json-view';
 import './index.less';
-import {get} from '@/services/dd-openapi-main/interfaceInfoController';
+import {get} from '@/services/dd-openapi-main/apiInfoController';
 import {ProFormGroup} from "@ant-design/pro-form/lib";
 import {ProFormField} from "@ant-design/pro-form";
+import {callGeneStrApi} from "@/services/dd-openapi-main/apiClientController";
+import {getCurrentUserInfo} from "@/services/dd-ms-auth/authController";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -26,14 +28,10 @@ const ApiDebugPage = () => {
   const [responseData, setResponseData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('params');
-  const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({
-    name: '用户查询接口',
-    description: '用于查询用户信息的接口',
-    url: '/api/user/{id}',
-    method: 'GET',
-    requestParams: '{"id":"long","name":"string"}',
-    requestHeader: '{"Content-Type":"application/json"}',
-  });
+  // 接口信息VO
+  const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({});
+  // 自定义请求头
+  const [apiKey, setApiKey] = useState<API.ApiKeyHeaders>({});
 
   // 解析JSON字符串为对象
   const parseJsonString = (str: string) => {
@@ -46,47 +44,24 @@ const ApiDebugPage = () => {
 
   // 处理调试请求
   const handleDebug = async (values: any) => {
-    setLoading(true);
-    setResponseData(null);
-
     try {
-      // 构建请求数据
-      const requestData = {
-        ...apiInfo,
-        ...values,
-        requestParams: values.requestParams ? JSON.stringify(values.requestParams) : '{}',
-        requestHeader: values.requestHeader ? values.requestHeader : {}
-      };
-      // 模拟请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800));
-      // 模拟响应数据
-      const mockResponse = {
-        status: 200,
-        data: {
-          id: 12345,
-          name: "张三",
-          email: "zhangsan@example.com",
-          roles: ["admin", "user"],
-          createdAt: "2023-01-15T10:30:00Z",
-          active: true,
-          profile: {
-            age: 28,
-            location: "北京市朝阳区"
-          }
-        },
-        headers: {
-          "Content-Type": "application/json",
-          "X-RateLimit-Limit": "1000",
-          "X-RateLimit-Remaining": "997"
-        },
-        responseTime: 156
-      };
-
-      setResponseData(mockResponse);
-      message.success('接口调试成功');
+      // TODO 如何处理不同API的调用？使用Set容器？
+      if (apiInfo.url?.includes("/ui-client/call-api/gene-str-api")) {
+        const apiResponse = await callGeneStrApi();
+        console.log("apiResponse = ", apiResponse);
+        if (apiResponse.code != 200) {
+          console.log("API调用失败, apiResponse = ", apiResponse);
+        }
+        setResponseData({
+          status: responseData.code,
+          data: apiResponse.data,
+          responseTime: responseData.responseTime,
+          headers: responseData.headers,
+        });
+        console.log("responseData = ", responseData);
+        message.success('接口调试成功');
+      }
     } catch (error) {
-      message.error('接口调试失败');
-      console.error('Debug error:', error);
       setResponseData({
         status: 500,
         error: "请求失败，请检查网络连接或API配置"
@@ -110,19 +85,35 @@ const ApiDebugPage = () => {
         const response = await get(interfaceId);
         console.log("/interface-api/interface/get/id rst = ", response);
         if (response.code === 200) {
+          // @ts-ignore
           setApiInfo(response.data);
         } else {
           throw new Error(response.message || '获取接口详情失败');
         }
       } catch (err) {
-        console.error('获取接口详情失败:', err);
-        // @ts-ignore
-        message.error(err.message || '获取接口详情失败');
       } finally {
         setLoading(false);
       }
     };
     fetchInterfaceData();
+
+    // 初始化用户的apiKey
+    const initApiKey = async () => {
+      try {
+        const respUserVO = await getCurrentUserInfo();
+        if (respUserVO != null && respUserVO.code == 200) {
+          setApiKey({
+            accessKey: respUserVO.data?.accessKey,
+            secretKey: respUserVO.data?.secretKey,
+          });
+        }
+      } catch (err) {
+        console.error('用户信息接口详情失败:', err);
+        // @ts-ignore
+        message.error(err.message || '用户信息接口详情失败');
+      }
+    };
+    initApiKey();
   }, [location]);
 
   return (
@@ -140,7 +131,6 @@ const ApiDebugPage = () => {
       <ProCard
         title="API基本信息"
         bordered
-        headerBordered
         className="api-info-card"
       >
         <Row gutter={24}>
@@ -195,13 +185,8 @@ const ApiDebugPage = () => {
             />
           </Col>
           <Col span={24}>
-            <ProCard
-              bordered
-              headerBordered
-              className="request-params-card"
-            >
-              <div className="request-params-title">
-                <Title level={4}>请求参数描述</Title>
+            <div>
+              <Title level={5}>请求参数描述</Title>
               </div>
               <pre style={{
                 padding: 16,
@@ -211,9 +196,23 @@ const ApiDebugPage = () => {
                 fontSize: '14px',
                 whiteSpace: 'pre-wrap'
               }}>
-      {apiInfo.requestParams}
+                {apiInfo.requestParams}
+              </pre>
+          </Col>
+          <Col span={24}>
+            <div>
+              <Title level={5}>curl请求示例（请求头accessKey、secretKey必须携带）</Title>
+            </div>
+            <pre style={{
+              padding: 16,
+              borderRadius: 4,
+              backgroundColor: '#2a2a2a',
+              color: '#fff',
+              fontSize: '14px',
+              whiteSpace: 'pre-wrap'
+            }}>
+      {apiInfo.requestHeader}
     </pre>
-            </ProCard>
           </Col>
         </Row>
       </ProCard>
@@ -237,10 +236,10 @@ const ApiDebugPage = () => {
             </div>
           ),
         }}
-        initialValues={{
-          requestParams: parseJsonString(apiInfo.requestParams),
-          requestHeader: parseJsonString(apiInfo.requestHeader),
-        }}
+        // initialValues={{
+        //   requestParams: parseJsonString(apiInfo.requestParams),
+        //   requestHeader: parseJsonString(apiInfo.requestHeader),
+        // }}
       >
         <ProCard
           title="请求配置"
@@ -264,21 +263,24 @@ const ApiDebugPage = () => {
                         creatorButtonProps={{
                           creatorButtonText: '添加参数',
                         }}
-                      >
-                        <Space direction="vertical" style={{ width: '100%' }}>
-                          <Row gutter={16}>
-                            <Col span={8}>
-                              <ProFormText name="key" label="参数名" />
-                            </Col>
-                            <Col span={8}>
-                              <ProFormText name="value" label="参数值" />
-                            </Col>
-                            <Col span={8}>
-                              <ProFormText name="description" label="描述" />
-                            </Col>
-                          </Row>
-                        </Space>
-                      </ProFormList>
+                        itemRender={({listDom, action}) => (
+                          <Space direction="vertical" style={{width: '100%'}}>
+                            <Row gutter={16}>
+                              <Col span={8}>
+                                <ProFormText name="key" label="参数名"/>
+                              </Col>
+                              <Col span={8}>
+                                <ProFormText name="value" label="参数值"/>
+                              </Col>
+                              <Col span={8}>
+                                <ProFormText name="description" label="描述"/>
+                              </Col>
+                            </Row>
+                            {listDom}
+                            {action}
+                          </Space>
+                        )}
+                      />
                     </ProFormGroup>
                   ) : (
                     <div style={{ textAlign: 'center', padding: 24 }}>

@@ -2,7 +2,7 @@ import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {PageContainer, ProTable,} from '@ant-design/pro-components';
 import {App} from 'antd';
 import React, {useRef, useState} from 'react';
-import {page} from "@/services/dd-openapi-main/interfaceInfoController";
+import {page} from "@/services/dd-openapi-main/apiInfoController";
 import CreateForm from "@/pages/interface/components/CreateForm";
 
 const TableList: React.FC = () => {

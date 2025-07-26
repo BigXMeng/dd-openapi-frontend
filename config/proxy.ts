@@ -7,11 +7,17 @@ export default {
       changeOrigin: true,
       pathRewrite: { '^/auth-api': '/auth-service' },
     },
-    // 订单服务代理
-    '/interface-api/': {
+    // 开放API接口信息接口
+    '/interfaceInfo-api/': {
       target: 'http://localhost:18011',
       changeOrigin: true,
-      pathRewrite: { '^/interface-api': '/dd-openapi-main-web' },
+      pathRewrite: { '^/interfaceInfo-api': '/dd-openapi-main-web' },
+    },
+    // 开放API调用
+    '/apiInvoke-api/': {
+      target: 'http://localhost:18011',
+      changeOrigin: true,
+      pathRewrite: { '^/apiInvoke-api': '/dd-openapi-main-web' },
     },
   },
 

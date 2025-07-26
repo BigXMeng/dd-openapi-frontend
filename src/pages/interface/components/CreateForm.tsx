@@ -5,7 +5,7 @@
  */
 
 // 业务接口：真正向后端发送新增接口请求的函数
-import { add } from '@/services/dd-openapi-main/interfaceInfoController';
+import { add } from '@/services/dd-openapi-main/apiInfoController';
 // Ant Design 图标
 import { PlusOutlined } from '@ant-design/icons';
 // ProComponents 表单控件
