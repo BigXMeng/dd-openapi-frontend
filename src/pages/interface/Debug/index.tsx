@@ -8,30 +8,27 @@ import {
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-components';
-import {Button, Col, Collapse, Input, message, Row, Space, Tabs, Typography} from 'antd';
+import {App, Button, Col, Collapse, Input, Row, Space, Tabs, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useLocation} from 'umi';
-import JsonView from 'react-json-view';
 import './index.less';
 import {get} from '@/services/dd-openapi-main/apiInfoController';
 import {ProFormGroup} from "@ant-design/pro-form/lib";
 import {ProFormField} from "@ant-design/pro-form";
-import {callGeneStrApi} from "@/services/dd-openapi-main/apiClientController";
-import {getCurrentUserInfo} from "@/services/dd-ms-auth/authController";
+import {callGeneStrApi, ipInfo} from "@/services/dd-openapi-main/apiClientController";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 const ApiDebugPage = () => {
+  const { message } = App.useApp();
   const location = useLocation();
   const [responseData, setResponseData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('params');
   // 接口信息VO
   const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({});
-  // 自定义请求头
-  const [apiKey, setApiKey] = useState<API.ApiKeyHeaders>({});
 
   // 解析JSON字符串为对象
   const parseJsonString = (str: string) => {
@@ -46,25 +43,59 @@ const ApiDebugPage = () => {
   const handleDebug = async (values: any) => {
     try {
       // TODO 如何处理不同API的调用？使用Set容器？
+      // 获取随机字符串API
       if (apiInfo.url?.includes("/ui-client/call-api/gene-str-api")) {
-        const apiResponse = await callGeneStrApi();
+        const apiResponse: API.ApiResponseString = await callGeneStrApi();
         console.log("apiResponse = ", apiResponse);
         if (apiResponse.code != 200) {
           console.log("API调用失败, apiResponse = ", apiResponse);
+          // 如果 API 调用失败，设置错误信息
+          setResponseData({
+            status: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+            error: apiResponse.message || "请求失败，请检查网络连接或API配置",
+          });
+        } else {
+          // 如果 API 调用成功，设置响应数据
+          setResponseData({
+            status: apiResponse.code, // 使用 apiResponse.code
+            data: apiResponse.data, // 使用 apiResponse.data
+            responseTime: apiResponse.responseTime || 0, // 使用 apiResponse.responseTime 或默认 0
+            headers: apiResponse.headers || {}, // 使用 apiResponse.headers 或默认空对象
+          });
+          message.success('接口调试成功');
         }
+        // 获取本地IP信息API调用
+      } else if (apiInfo.url?.includes("/ui-client/call-api/ip-info")) {
+        const apiResponse: API.ApiResponseIpInfoResp = await ipInfo();
+        console.log("apiResponse = ", apiResponse);
+        if (apiResponse.code != 200) {
+          console.log("API调用失败, apiResponse = ", apiResponse);
+          // 如果 API 调用失败，设置错误信息
+          setResponseData({
+            status: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+            error: apiResponse.message || "请求失败，请检查网络连接或API配置",
+          });
+        } else {
+          // 如果 API 调用成功，设置响应数据
+          setResponseData({
+            status: apiResponse.code, // 使用 apiResponse.code
+            data: apiResponse.data, // 使用 apiResponse.data
+            responseTime: apiResponse.responseTime || 0, // 使用 apiResponse.responseTime 或默认 0
+            headers: apiResponse.headers || {}, // 使用 apiResponse.headers 或默认空对象
+          });
+          message.success('接口调试成功');
+        }
+      } else {
         setResponseData({
-          status: responseData.code,
-          data: apiResponse.data,
-          responseTime: responseData.responseTime,
-          headers: responseData.headers,
+          status: 500,
+          error: "当前API不支持调用~",
         });
-        console.log("responseData = ", responseData);
-        message.success('接口调试成功');
       }
     } catch (error) {
+      // 如果发生异常，设置错误信息
       setResponseData({
         status: 500,
-        error: "请求失败，请检查网络连接或API配置"
+        error: "请求失败，请检查网络连接或API配置",
       });
     } finally {
       setLoading(false);
@@ -96,24 +127,6 @@ const ApiDebugPage = () => {
       }
     };
     fetchInterfaceData();
-
-    // 初始化用户的apiKey
-    const initApiKey = async () => {
-      try {
-        const respUserVO = await getCurrentUserInfo();
-        if (respUserVO != null && respUserVO.code == 200) {
-          setApiKey({
-            accessKey: respUserVO.data?.accessKey,
-            secretKey: respUserVO.data?.secretKey,
-          });
-        }
-      } catch (err) {
-        console.error('用户信息接口详情失败:', err);
-        // @ts-ignore
-        message.error(err.message || '用户信息接口详情失败');
-      }
-    };
-    initApiKey();
   }, [location]);
 
   return (
@@ -201,7 +214,7 @@ const ApiDebugPage = () => {
           </Col>
           <Col span={24}>
             <div>
-              <Title level={5}>curl请求示例（请求头accessKey、secretKey必须携带）</Title>
+              <Title level={5}>curl请求示例（请求头accessKey、secretKey无需前端携带）</Title>
             </div>
             <pre style={{
               padding: 16,
@@ -359,44 +372,38 @@ const ApiDebugPage = () => {
                   <span
                     className={`status-code ${responseData.status < 300 ? 'success' : responseData.status < 400 ? 'warning' : 'error'}`}
                   >
-                    {responseData.status}
-                  </span>
+              {responseData.status}
+            </span>
                 </div>
                 <div>
                   <span className="status-label">响应时间:</span>
                   <span className="status-value">
-                    {responseData.responseTime} ms
-                  </span>
+              {responseData.responseTime} ms
+            </span>
                 </div>
               </div>
             </Panel>
 
             <Panel header="响应头" key="2">
-              <JsonView
-                src={responseData.headers || {}}
-                name={false}
-                displayDataTypes={false}
-                theme="monokai"
-                style={{
-                  padding: 16,
-                  borderRadius: 4,
-                  backgroundColor: '#2a2a2a',
-                }}
-              />
+              <div className="response-status">
+                <div>
+                  <span className="status-label">响应头:</span>
+                  <span className="status-value">
+              {responseData.headers || {}}
+            </span>
+                </div>
+              </div>
             </Panel>
 
             <Panel header="响应体" key="3">
-              <JsonView
-                src={responseData.data || responseData.error}
-                name={false}
-                displayDataTypes={false}
-                theme="monokai"
-                style={{
-                  padding: 16,
-                  borderRadius: 4,
-                  backgroundColor: '#2a2a2a',
-                }}
-              />
+              <div className="response-status">
+                <div>
+                  <span className="status-label">响应体:</span>
+                  <span className="status-value">
+              {JSON.stringify(responseData.data) || JSON.stringify(responseData.error)}
+            </span>
+                </div>
+              </div>
             </Panel>
           </Collapse>
         </ProCard>

@@ -226,6 +226,5 @@ declare namespace API {
   // 自定义请求头（只包含accessKey和secretKey）
   type ApiKeyHeaders = {
     accessKey?: String,
-    secretKey?: String
   };
 }
