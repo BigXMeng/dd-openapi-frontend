@@ -4,7 +4,7 @@ import { request } from "@umijs/max";
 
 /** 此处后端没有提供注释 GET /ui-client/call-api/gene-str-api */
 export async function callGeneStrApi(options?: { [key: string]: any }) {
-  return request<API.ApiResponseString>("/ui-client/call-api/gene-str-api", {
+  return request<API.ApiResponseCallOpenApi>("/ui-client/call-api/gene-str-api", {
     method: "GET",
     headers: {
       "Content-Type": "application/json", // 默认请求头
@@ -16,7 +16,7 @@ export async function callGeneStrApi(options?: { [key: string]: any }) {
 
 /** 此处后端没有提供注释 GET /ui-client/call-api/ip-info */
 export async function ipInfo(options?: { [key: string]: any }) {
-  return request<API.ApiResponseIpInfoResp>("/ui-client/call-api/ip-info", {
+  return request<API.ApiResponseCallOpenApi>("/ui-client/call-api/ip-info", {
     method: "GET",
     ...(options || {}),
   });
@@ -29,7 +29,7 @@ export async function qrCode(
   options?: { [key: string]: any }
 ) {
   const { content: param0, ...queryParams } = params;
-  return request<API.ApiResponseQrCodeResp>(
+  return request<API.ApiResponseCallOpenApi>(
     `/ui-client/call-api/qr-code/${param0}`,
     {
       method: "GET",
@@ -44,7 +44,7 @@ export async function uuidBatch(
   body: API.CallUUIDGeneReq,
   options?: { [key: string]: any }
 ) {
-  return request<API.ApiResponseCallUUIDGeneResp>(
+  return request<API.ApiResponseCallOpenApi>(
     "/ui-client/call-api/uuid-batch",
     {
       method: "POST",

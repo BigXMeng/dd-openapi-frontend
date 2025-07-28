@@ -1,12 +1,11 @@
 import {SettingDrawer, Settings as LayoutSettings} from '@ant-design/pro-components';
 import '@ant-design/v5-patch-for-react-19';
-import {history, Link, RequestConfig, RequestOptions,} from '@umijs/max';
+import {history, RequestConfig, RequestOptions,} from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import {getUserInfoByToken} from "@/services/dd-ms-auth/userInfoController";
 import {RunTimeLayoutConfig} from "@@/plugin-layout/types";
 import {AvatarDropdown, AvatarName, Footer} from "@/components";
 import {LinkOutlined} from "@ant-design/icons";
-import {useModel} from "umi";
 
 const loginPath = '/user/login';
 const isDev = process.env.NODE_ENV === 'development';
@@ -81,14 +80,21 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         width: '331px',
       },
     ],
-    links: isDev
-      ? [
-        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-          <LinkOutlined />
-          <span>OpenAPI 文档</span>
-        </Link>,
-      ]
-      : [],
+    links:
+      [
+        <a key="openapi" href="https://blog.bigbigmeng.online/" target="_blank" rel="noopener noreferrer">
+          <LinkOutlined/>
+          <span>API调用说明文档</span>
+        </a>
+      ],
+    // links: isDev
+    //   ? [
+    //     <Link key="openapi" to="https://blog.bigbigmeng.online/" target="_blank">
+    //       <LinkOutlined />
+    //       <span>OpenAPI调用文档说明</span>
+    //     </Link>,
+    //   ]
+    //   : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
@@ -203,7 +209,7 @@ export const request: RequestConfig = {
 };
 
 // 后端服务类型定义
-type ServiceType = 'auth' | 'interfaceInfo' | 'apiInvoke';
+type ServiceType = 'auth' | 'openapi-main';
 
 // 获取服务基础URL
 const getServiceBaseURL = (service: ServiceType) => {
@@ -218,8 +224,9 @@ const getServiceBaseURL = (service: ServiceType) => {
 // 辅助函数：根据URL识别服务类型
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
-  if (url.startsWith('/auth') || url.startsWith('/user/info')) return 'auth';
-  if (url.startsWith('/interface')) return 'interfaceInfo';
-  if (url.startsWith('/ui-client')) return 'apiInvoke';
+  if (url.startsWith('/auth') || url.startsWith('/user')) return 'auth';
+  if (url.startsWith('/interface')) return 'openapi-main';
+  if (url.startsWith('/ui-client')) return 'openapi-main';
+  if (url.startsWith('/sdk')) return 'openapi-main';
   return null;
 }

@@ -24,7 +24,7 @@ const { Panel } = Collapse;
 const ApiDebugPage = () => {
   const { message } = App.useApp();
   const location = useLocation();
-  const [responseData, setResponseData] = useState<any>(null);
+  const [responseData, setResponseData] = useState<API.ApiResponseCallOpenApi>();
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('params');
   // 接口信息VO
@@ -45,57 +45,58 @@ const ApiDebugPage = () => {
       // TODO 如何处理不同API的调用？使用Set容器？
       // 获取随机字符串API
       if (apiInfo.url?.includes("/ui-client/call-api/gene-str-api")) {
-        const apiResponse: API.ApiResponseString = await callGeneStrApi();
+        const apiResponse: API.ApiResponseCallOpenApi = await callGeneStrApi();
         console.log("apiResponse = ", apiResponse);
         if (apiResponse.code != 200) {
           console.log("API调用失败, apiResponse = ", apiResponse);
           // 如果 API 调用失败，设置错误信息
           setResponseData({
-            status: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
-            error: apiResponse.message || "请求失败，请检查网络连接或API配置",
+            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
           });
         } else {
           // 如果 API 调用成功，设置响应数据
           setResponseData({
-            status: apiResponse.code, // 使用 apiResponse.code
+            code: apiResponse.code, // 使用 apiResponse.code
+            message: apiResponse.message,
             data: apiResponse.data, // 使用 apiResponse.data
-            responseTime: apiResponse.responseTime || 0, // 使用 apiResponse.responseTime 或默认 0
-            headers: apiResponse.headers || {}, // 使用 apiResponse.headers 或默认空对象
+            responseTime: apiResponse.responseTime, // 使用 apiResponse.responseTime 或默认 0
+            headers: apiResponse.headers, // 使用 apiResponse.headers 或默认空对象
           });
           message.success('接口调试成功');
         }
         // 获取本地IP信息API调用
       } else if (apiInfo.url?.includes("/ui-client/call-api/ip-info")) {
-        const apiResponse: API.ApiResponseIpInfoResp = await ipInfo();
+        const apiResponse: API.ApiResponseCallOpenApi = await ipInfo();
         console.log("apiResponse = ", apiResponse);
         if (apiResponse.code != 200) {
           console.log("API调用失败, apiResponse = ", apiResponse);
           // 如果 API 调用失败，设置错误信息
           setResponseData({
-            status: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
-            error: apiResponse.message || "请求失败，请检查网络连接或API配置",
+            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
           });
         } else {
           // 如果 API 调用成功，设置响应数据
           setResponseData({
-            status: apiResponse.code, // 使用 apiResponse.code
+            code: apiResponse.code, // 使用 apiResponse.code
             data: apiResponse.data, // 使用 apiResponse.data
-            responseTime: apiResponse.responseTime || 0, // 使用 apiResponse.responseTime 或默认 0
-            headers: apiResponse.headers || {}, // 使用 apiResponse.headers 或默认空对象
+            responseTime: apiResponse.responseTime || '', // 使用 apiResponse.responseTime 或默认 0
+            headers: apiResponse.headers || '', // 使用 apiResponse.headers 或默认空对象
           });
           message.success('接口调试成功');
         }
       } else {
         setResponseData({
-          status: 500,
-          error: "当前API不支持调用~",
+          code: 500,
+          message: "当前API不支持调用~",
         });
       }
     } catch (error) {
       // 如果发生异常，设置错误信息
       setResponseData({
-        status: 500,
-        error: "请求失败，请检查网络连接或API配置",
+        code: 500,
+        message: "请求失败，请检查网络连接或API配置",
       });
     } finally {
       setLoading(false);
@@ -129,6 +130,7 @@ const ApiDebugPage = () => {
     fetchInterfaceData();
   }, [location]);
 
+  // @ts-ignore
   return (
     <PageContainer
       className="api-debug-page"
@@ -249,10 +251,6 @@ const ApiDebugPage = () => {
             </div>
           ),
         }}
-        // initialValues={{
-        //   requestParams: parseJsonString(apiInfo.requestParams),
-        //   requestHeader: parseJsonString(apiInfo.requestHeader),
-        // }}
       >
         <ProCard
           title="请求配置"
@@ -370,9 +368,10 @@ const ApiDebugPage = () => {
                 <div>
                   <span className="status-label">状态码:</span>
                   <span
-                    className={`status-code ${responseData.status < 300 ? 'success' : responseData.status < 400 ? 'warning' : 'error'}`}
+                    // @ts-ignore
+                    className={`status-code ${responseData.code < 300 ? 'success' : 'error'}`}
                   >
-              {responseData.status}
+              {responseData.code}
             </span>
                 </div>
                 <div>
@@ -389,7 +388,7 @@ const ApiDebugPage = () => {
                 <div>
                   <span className="status-label">响应头:</span>
                   <span className="status-value">
-              {responseData.headers || {}}
+              {responseData.headers}
             </span>
                 </div>
               </div>
@@ -400,7 +399,7 @@ const ApiDebugPage = () => {
                 <div>
                   <span className="status-label">响应体:</span>
                   <span className="status-value">
-              {JSON.stringify(responseData.data) || JSON.stringify(responseData.error)}
+              {JSON.stringify(responseData.data) || JSON.stringify(responseData.message)}
             </span>
                 </div>
               </div>

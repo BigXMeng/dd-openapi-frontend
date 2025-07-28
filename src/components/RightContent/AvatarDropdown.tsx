@@ -1,11 +1,14 @@
-import {ApiOutlined, LogoutOutlined, SettingOutlined, UserOutlined,} from '@ant-design/icons';
+import {ApiOutlined, CloudDownloadOutlined, LogoutOutlined,} from '@ant-design/icons';
+// @ts-ignore
 import {history, useModel} from '@umijs/max';
-import {MenuProps, message, Spin} from 'antd';
+import {Button, MenuProps, message, Modal, Spin} from 'antd';
 import {createStyles} from 'antd-style';
-import React from 'react';
+import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
-import {logout} from '@/services/dd-ms-auth/authController'; // 1️⃣ 用别名防止重名
+import {logout} from '@/services/dd-ms-auth/authController';
+import {sdkAcquire} from "@/services/dd-openapi-main/sdkController";
+import {geneApiKey} from "@/services/dd-ms-auth/userInfoController";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -36,8 +39,59 @@ const useStyles = createStyles(({ token }) => {
   };
 });
 
-export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children,}) => {
+// @ts-ignore
+const ApiKeyModal = ({apiKeyModalVisible, setApiKeyModalVisible}) => {
+  const [accessKey, setAccessKey] = useState<string>('待获取');
+  const [secretKey, setSecretKey] = useState<string>('待获取');
+
+  const handleGenerateApiKey = async () => {
+    try {
+      const response = await geneApiKey();
+      if (response.code === 200) {
+        setAccessKey(response.data?.accessKey || '待获取');
+        setSecretKey(response.data?.secretKey || '待获取');
+        message.success('API Key 生成成功');
+      } else {
+        message.error(response.message || 'API Key 生成失败');
+      }
+    } catch (error) {
+      message.error('API Key 生成失败');
+    }
+  };
+
+  return (
+    <Modal
+      title="API Key 获取"
+      open={apiKeyModalVisible}
+      onCancel={() => setApiKeyModalVisible(false)}
+      footer={[
+        <Button key="close" onClick={() => {
+          setAccessKey('待获取');
+          setSecretKey('待获取');
+          setApiKeyModalVisible(false)
+        }}>
+          关闭
+        </Button>,
+        <Button key="generate" type="primary" onClick={handleGenerateApiKey}>
+          生成 API Key
+        </Button>,
+      ]}
+    >
+      <div>
+        <p>[Access Key] <span>{accessKey}</span></p>
+        <p>[Secret Key] <span>{secretKey}</span></p>
+      </div>
+    </Modal>
+  );
+};
+
+export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children}) => {
   menu = true;
+
+  const {initialState, setInitialState} = useModel('@@initialState');
+  const {styles} = useStyles();
+
+  const [apiKeyModalVisible, setApiKeyModalVisible] = useState(false);
 
   /** 真正的退出登录逻辑 */
   const logoutS = async () => {
@@ -52,24 +106,24 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
       // 3️⃣ 清理本地状态
       flushSync(() => {
         // 清掉全局用户信息
-        setInitialState((s) => ({...s, currentUser: undefined}));
-        localStorage.removeItem("token")
+        setInitialState((s: any) => ({...s, currentUser: undefined}));
+        localStorage.removeItem('token');
       });
-      // 4️⃣ 记录当前地址用于登录后回跳
-      const {pathname, search} = window.location;
-      history.replace({
-        pathname: '/user/login',
-        search: new URLSearchParams({redirect: pathname + search}).toString(),
-      });
+      // 4️⃣ 跳转到登录页
+      window.location.href = '/user/login';
     }
   };
 
-  const { styles } = useStyles();
-  const { initialState, setInitialState } = useModel('@@initialState');
-
   const onMenuClick: MenuProps['onClick'] = ({key}) => {
     if (key === 'logout') {
-      logoutS(); // 5️⃣ 调用修复后的方法
+      logoutS();
+      return;
+    } else if (key === 'sdkAcquire') {
+      sdkAcquire();
+      return;
+    } else if (key === 'apiKeyAcquire') {
+      // 获取apiKey的行为
+      setApiKeyModalVisible(true);
       return;
     }
     history.push('/');
@@ -84,27 +138,15 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
   if (!initialState?.currentUser?.account) return loading;
 
   const menuItems: MenuProps['items'] = [
-    // ...(menu
-    //   ? [
-    //       {
-    //         key: 'center',
-    //         icon: <UserOutlined />,
-    //         label: '个人中心',
-    //       },
-    //       {
-    //         key: 'settings',
-    //         icon: <SettingOutlined />,
-    //         label: '个人设置',
-    //       },
-    //       {
-    //         type: 'divider' as const,
-    //       },
-    //     ]
-    //   : []),
     {
-      key: 'settings',
+      key: 'apiKeyAcquire',
       icon: <ApiOutlined />,
       label: 'API密钥获取',
+    },
+    {
+      key: 'sdkAcquire',
+      icon: <CloudDownloadOutlined/>,
+      label: 'SDK工具包下载',
     },
     {
       key: 'logout',
@@ -114,14 +156,17 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
   ];
 
   return (
-    <HeaderDropdown
-      menu={{
-        selectedKeys: [],
-        onClick: onMenuClick,
-        items: menuItems,
-      }}
-    >
-      {children}
-    </HeaderDropdown>
+    <>
+      <HeaderDropdown
+        menu={{
+          selectedKeys: [],
+          onClick: onMenuClick,
+          items: menuItems,
+        }}
+      >
+        {children}
+      </HeaderDropdown>
+      <ApiKeyModal apiKeyModalVisible={apiKeyModalVisible} setApiKeyModalVisible={setApiKeyModalVisible}/>
+    </>
   );
 };

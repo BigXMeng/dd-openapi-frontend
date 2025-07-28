@@ -1,66 +1,11 @@
 declare namespace API {
-  type ApiResponseCallUUIDGeneResp = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: CallUUIDGeneResp;
-  };
 
-  type ApiResponseInteger = {
+  type ApiResponseCallOpenApi = {
     code?: number;
     message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: number;
-  };
-
-  type ApiResponseInterfaceInfoVO = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: InterfaceInfoVO;
-  };
-
-  type ApiResponseIPageInterfaceInfoVO = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: IPageInterfaceInfoVO;
-  };
-
-  type ApiResponseIpInfoResp = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: IpInfoResp;
-  };
-
-  type ApiResponseQrCodeResp = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: QrCodeResp;
-  };
-
-  type ApiResponseString = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
+    headers?: string;
     responseTime?: string;
     data?: string;
-  };
-
-  type ApiResponseVoid = {
-    code?: number;
-    message?: string;
-    responseHeader?: string;
-    responseTime?: string;
-    data?: Record<string, any>;
   };
 
   type CallUUIDGeneReq = {

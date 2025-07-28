@@ -10,6 +10,14 @@ export async function getUserInfoByToken(options?: { [key: string]: any }) {
   });
 }
 
+/** 此处后端没有提供注释 POST /user/gene-api-key */
+export async function geneApiKey(options?: { [key: string]: any }) {
+  return request<API.ApiResponseApiKeyGeneResponse>("/user/gene-api-key", {
+    method: "POST",
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 POST /user/info/secretKey */
 export async function secretKey(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

@@ -29,6 +29,17 @@ declare namespace API {
     data?: UserVO;
   };
 
+  type ApiKeyGeneResponse = {
+    accessKey?: string;
+    secretKey?: string;
+  };
+
+  type ApiResponseApiKeyGeneResponse = {
+    code?: number;
+    message?: string;
+    data?: ApiKeyGeneResponse;
+  };
+
   type ApiResponseVoid = {
     code?: number;
     message?: string;

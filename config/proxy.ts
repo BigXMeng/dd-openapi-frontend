@@ -8,10 +8,10 @@ export default {
       pathRewrite: { '^/auth-api': '/auth-service' },
     },
     // 开放API接口信息接口
-    '/interfaceInfo-api/': {
+    '/openapi-main-api/': {
       target: 'http://localhost:18011',
       changeOrigin: true,
-      pathRewrite: { '^/interfaceInfo-api': '/dd-openapi-main-web' },
+      pathRewrite: { '^/openapi-main-api': '/dd-openapi-main-web' },
     },
     // 开放API调用
     '/apiInvoke-api/': {
