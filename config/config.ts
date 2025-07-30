@@ -148,11 +148,11 @@ export default defineConfig({
      </dependency>
    */
   openAPI: [
-    {
-      requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
-      projectName: 'dd-ms-auth-new',
-    },
+    // {
+    //   requestLibPath: "import { request } from '@umijs/max'",
+    //   schemaPath: 'http://localhost:10066/auth-service/v3/api-docs',
+    //   projectName: 'dd-ms-auth-new',
+    // },
     // {
     //   requestLibPath: "import { request } from '@umijs/max'",
     //   schemaPath: 'http://localhost:18011/dd-openapi-main-web/v3/api-docs',

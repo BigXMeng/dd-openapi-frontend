@@ -224,9 +224,10 @@ const getServiceBaseURL = (service: ServiceType) => {
 // 辅助函数：根据URL识别服务类型
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
-  if (url.startsWith('/auth') || url.startsWith('/user')) return 'auth';
-  if (url.startsWith('/interface')) return 'openapi-main';
-  if (url.startsWith('/ui-client')) return 'openapi-main';
-  if (url.startsWith('/sdk')) return 'openapi-main';
+  if (url.startsWith('/auth/') || url.startsWith('/user/')) return 'auth';
+  if (url.startsWith('/interface/')) return 'openapi-main';
+  if (url.startsWith('/ui-client/')) return 'openapi-main';
+  if (url.startsWith('/user-interface/')) return 'openapi-main';
+  if (url.startsWith('/sdk/')) return 'openapi-main';
   return null;
 }
