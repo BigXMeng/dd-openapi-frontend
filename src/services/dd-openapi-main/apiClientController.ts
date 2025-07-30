@@ -41,8 +41,8 @@ export async function qrCode(
 
 /** 此处后端没有提供注释 POST /ui-client/call-api/uuid-batch */
 export async function uuidBatch(
-  body: API.CallUUIDGeneReq,
-  options?: { [key: string]: any }
+  body: API.CallUUIDGeneReq | null,
+  options?: { [p: string]: any }
 ) {
   return request<API.ApiResponseCallOpenApi>(
     "/ui-client/call-api/uuid-batch",

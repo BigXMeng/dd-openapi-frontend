@@ -104,6 +104,7 @@ declare namespace API {
   };
 
   type InterfaceInfoVO = {
+    data: any;
     /** 主键ID */
     id?: number;
     /** 名称 */
@@ -132,7 +133,16 @@ declare namespace API {
     updateTime?: string;
     /** 是否删除(0-未删, 1-已删) */
     isDelete?: number;
+
+    userInterfaceInvokeInfoVO?: UserInterfaceInvokeInfoVO
   };
+
+  type UserInterfaceInvokeInfoVO = {
+    /** 针对当前用户的剩余调用次数 */
+    invokeLeftNum?: number;
+    /** 当前用户已调用次数 */
+    invokedNum?: number;
+  }
 
   type IPageInterfaceInfoVO = {
     size?: number;
@@ -141,6 +151,11 @@ declare namespace API {
     current?: number;
     pages?: number;
   };
+
+  type EnableInvokeInterfaceReq = {
+    interfaceId?: number;
+    invokeNum?: number;
+  }
 
   type IpInfoResp = {
     ip?: string;

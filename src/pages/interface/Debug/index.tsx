@@ -15,7 +15,11 @@ import './index.less';
 import {get} from '@/services/dd-openapi-main/apiInfoController';
 import {ProFormGroup} from "@ant-design/pro-form/lib";
 import {ProFormField} from "@ant-design/pro-form";
-import {callGeneStrApi, ipInfo} from "@/services/dd-openapi-main/apiClientController";
+import {
+  callGeneStrApi,
+  ipInfo,
+  uuidBatch
+} from "@/services/dd-openapi-main/apiClientController";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -29,6 +33,7 @@ const ApiDebugPage = () => {
   const [activeKey, setActiveKey] = useState('params');
   // 接口信息VO
   const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({});
+  const [callUUIDGeneReq, setCallUUIDGeneReq] = useState<API.CallUUIDGeneReq | null>(null);
 
   // 解析JSON字符串为对象
   const parseJsonString = (str: string) => {
@@ -41,10 +46,13 @@ const ApiDebugPage = () => {
 
   // 处理调试请求
   const handleDebug = async (values: any) => {
+    // 判断当前的API调用次数是否已用完 用完则不可再调用
+    if (apiInfo.userInterfaceInvokeInfoVO?.invokeLeftNum === 0) {
+      message.error("您对次API的调用次数已用完，请再次开通。");
+    }
     try {
-      // TODO 如何处理不同API的调用？使用Set容器？
       // 获取随机字符串API
-      if (apiInfo.url?.includes("/ui-client/call-api/gene-str-api")) {
+      if (apiInfo.url?.includes("/api/open/gene-a-str")) {
         const apiResponse: API.ApiResponseCallOpenApi = await callGeneStrApi();
         console.log("apiResponse = ", apiResponse);
         if (apiResponse.code != 200) {
@@ -66,8 +74,29 @@ const ApiDebugPage = () => {
           message.success('接口调试成功');
         }
         // 获取本地IP信息API调用
-      } else if (apiInfo.url?.includes("/ui-client/call-api/ip-info")) {
+      } else if (apiInfo.url?.includes("/api/open/ip-info")) {
         const apiResponse: API.ApiResponseCallOpenApi = await ipInfo();
+        console.log("apiResponse = ", apiResponse);
+        if (apiResponse.code != 200) {
+          console.log("API调用失败, apiResponse = ", apiResponse);
+          // 如果 API 调用失败，设置错误信息
+          setResponseData({
+            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
+          });
+        } else {
+          // 如果 API 调用成功，设置响应数据
+          setResponseData({
+            code: apiResponse.code, // 使用 apiResponse.code
+            data: apiResponse.data, // 使用 apiResponse.data
+            responseTime: apiResponse.responseTime || '', // 使用 apiResponse.responseTime 或默认 0
+            headers: apiResponse.headers || '', // 使用 apiResponse.headers 或默认空对象
+          });
+          message.success('接口调试成功');
+        }
+      } else if (apiInfo.url?.includes("/api/open/uuid-batch")) {
+        console.log("callUUIDGeneReq当前值：", callUUIDGeneReq);
+        const apiResponse: API.ApiResponseCallOpenApi = await uuidBatch(callUUIDGeneReq);
         console.log("apiResponse = ", apiResponse);
         if (apiResponse.code != 200) {
           console.log("API调用失败, apiResponse = ", apiResponse);
@@ -100,6 +129,26 @@ const ApiDebugPage = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  /**
+   * 处理请求体的输入
+   * @param e
+   */
+  const handleRequestBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    try {
+      const parsedData = JSON.parse(e.target.value);
+      console.log("解析后的请求体：", parsedData);
+      if (typeof parsedData.num === 'number') {
+        setCallUUIDGeneReq(parsedData);
+      } else {
+        message.error('请求体内容格式错误：num 必须是数字');
+        setCallUUIDGeneReq(null);
+      }
+    } catch (error) {
+      message.error('请求体内容格式错误：请输入有效的JSON格式');
+      setCallUUIDGeneReq(null);
     }
   };
 
@@ -303,23 +352,20 @@ const ApiDebugPage = () => {
                   )}
                 </TabPane>
 
-                <TabPane
-                  tab="请求体"
-                  key="body"
-                  disabled={method === 'GET'}
-                >
+                <TabPane tab="请求体" key="body" disabled={method === 'GET'}>
                   {method !== 'GET' ? (
                     <ProFormField name="requestParams" label="请求体内容">
                       <Input.TextArea
                         rows={8}
-                        placeholder="请输入JSON格式的请求体"
-                        style={{ fontFamily: 'monospace' }}
+                        placeholder="请输入JSON格式的请求体，参照【请求参数描述】"
+                      style={{ fontFamily: 'monospace' }}
+                      onChange={handleRequestBodyChange}
                       />
                     </ProFormField>
                   ) : (
                     <div style={{ textAlign: 'center', padding: 24 }}>
                       <Title level={4} type="secondary">
-                        GET 请求通常不使用请求体
+                        GET请求不使用请求体
                       </Title>
                       <p>请切换到"请求参数"标签页设置URL参数</p>
                     </div>

@@ -3,18 +3,24 @@ import {PageContainer, ProTable,} from '@ant-design/pro-components';
 import {App} from 'antd';
 import React, {useRef, useState} from 'react';
 import {page} from "@/services/dd-openapi-main/apiInfoController";
-import CreateForm from "@/pages/interface/components/CreateForm";
+import {history} from "@@/core/history";
+import EnableInvokeModal, { EnableInvokeModalRef } from '@/pages/interface/components/EnableInvokeModal';
+import UpdateForm from "@/pages/interface/components/UpdateForm";
 
 const TableList: React.FC = () => {
+  const enableInvokeModalRef = useRef<EnableInvokeModalRef>(null);
   const {message} = App.useApp();   // ← 不再从 antd 直接引入
   const actionRef = useRef<ActionType | null>(null);
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [interfaceRow, setInterfaceRow] = useState<API.InterfaceInfoVO>();
   const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfoVO[]>([]);
 
-  function handleDebug(record: API.InterfaceInfoVO) {
-
-  }
+  const handleDebug = (record: API.InterfaceInfoVO) => {
+    // 跳转到调试页面，携带接口数据作为状态
+    history.push({
+      pathname: `/interface/debug/${record.id}`,
+    });
+  };
 
   const columns: ProColumns<API.InterfaceInfoVO>[] = [
     {
@@ -55,13 +61,6 @@ const TableList: React.FC = () => {
       dataIndex: 'url',
       valueType: 'textarea',
     },
-    // {
-    //   title: '服务调用次数',
-    //   dataIndex: 'callNo',
-    //   sorter: true,
-    //   hideInForm: true,
-    //   renderText: (val: string) => `${val}${'万'}`,
-    // },
     {
       title: '状态',
       dataIndex: 'status',
@@ -84,12 +83,29 @@ const TableList: React.FC = () => {
       },
     },
     {
+      title: '可调用',
+      render: (_, record) => `${record.userInterfaceInvokeInfoVO?.invokeLeftNum ?? '0'}次`, // 拼接"次"
+      valueType: 'textarea',
+    },
+    {
+      title: '已调用',
+      render: (_, record) => `${record.userInterfaceInvokeInfoVO?.invokedNum ?? '0'}次`, // 拼接"次"
+      valueType: 'textarea',
+    },
+    {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
         <a key="debug" onClick={() => handleDebug(record)}>
           在线调试
+        </a>,
+        <a key="debug" onClick={() => {
+          enableInvokeModalRef.current?.handleEnableInvoke(record);
+          // 刷新分页列表
+          actionRef.current?.reload();
+        }}>
+          开通调用次数
         </a>,
       ],
     }
@@ -105,7 +121,7 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" reload={actionRef.current?.reload}/>]}
+        // toolBarRender={() => [<CreateForm key="create" reload={actionRef.current?.reload}/>]}
         request={async (params, sort, filter) => {
           // 构造符合 InterfaceInfoQueryReq 的请求参数
           const requestBody: API.InterfaceInfoQueryReq = {
@@ -137,6 +153,13 @@ const TableList: React.FC = () => {
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
           },
+        }}
+      />
+      <EnableInvokeModal
+        ref={enableInvokeModalRef}
+        /* 正确返回后更新当前列表 */
+        onSuccess={() => {
+          actionRef.current?.reload(); // 在这里调用刷新
         }}
       />
     </PageContainer>
