@@ -20,6 +20,8 @@ import {
   ipInfo,
   uuidBatch
 } from "@/services/dd-openapi-main/apiClientController";
+import {undefined} from "@umijs/utils/compiled/zod";
+import GoBackButton from "@/components/GoBackButton";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -32,7 +34,29 @@ const ApiDebugPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('params');
   // 接口信息VO
-  const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({});
+  const [apiInfo, setApiInfo] = useState<API.InterfaceInfoVO>({
+    code: 0,
+    createTime: "",
+    data: undefined,
+    description: "",
+    id: 0,
+    isDelete: 0,
+    message: "",
+    method: "",
+    name: "",
+    requestHeader: "",
+    requestParams: "",
+    responseHeader: "",
+    status: 0,
+    updateTime: "",
+    url: "",
+    userAccount: "",
+    userInterfaceInvokeInfoVO: {
+      invokeLeftNum: 0,
+      invokedNum: 0
+    },
+    userName: ""
+  });
   const [callUUIDGeneReq, setCallUUIDGeneReq] = useState<API.CallUUIDGeneReq | null>(null);
 
   // 解析JSON字符串为对象
@@ -47,80 +71,33 @@ const ApiDebugPage = () => {
   // 处理调试请求
   const handleDebug = async (values: any) => {
     // 判断当前的API调用次数是否已用完 用完则不可再调用
-    if (apiInfo.userInterfaceInvokeInfoVO?.invokeLeftNum === 0) {
-      message.error("您对次API的调用次数已用完，请再次开通。");
-    }
+    // if (apiInfo.userInterfaceInvokeInfoVO?.invokeLeftNum === 0) {
+    //   message.error("您对次API的调用次数已用完，请再次开通。");
+    //   return;
+    // }
+
     try {
-      // 获取随机字符串API
+      // 根据 API URL 调用不同的方法
+      let apiResponse: API.ApiResponseCallOpenApi;
+
       if (apiInfo.url?.includes("/api/open/gene-a-str")) {
-        const apiResponse: API.ApiResponseCallOpenApi = await callGeneStrApi();
-        console.log("apiResponse = ", apiResponse);
-        if (apiResponse.code != 200) {
-          console.log("API调用失败, apiResponse = ", apiResponse);
-          // 如果 API 调用失败，设置错误信息
-          setResponseData({
-            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
-            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
-          });
-        } else {
-          // 如果 API 调用成功，设置响应数据
-          setResponseData({
-            code: apiResponse.code, // 使用 apiResponse.code
-            message: apiResponse.message,
-            data: apiResponse.data, // 使用 apiResponse.data
-            responseTime: apiResponse.responseTime, // 使用 apiResponse.responseTime 或默认 0
-            headers: apiResponse.headers, // 使用 apiResponse.headers 或默认空对象
-          });
-          message.success('接口调试成功');
-        }
-        // 获取本地IP信息API调用
+        apiResponse = await callGeneStrApi();
       } else if (apiInfo.url?.includes("/api/open/ip-info")) {
-        const apiResponse: API.ApiResponseCallOpenApi = await ipInfo();
-        console.log("apiResponse = ", apiResponse);
-        if (apiResponse.code != 200) {
-          console.log("API调用失败, apiResponse = ", apiResponse);
-          // 如果 API 调用失败，设置错误信息
-          setResponseData({
-            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
-            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
-          });
-        } else {
-          // 如果 API 调用成功，设置响应数据
-          setResponseData({
-            code: apiResponse.code, // 使用 apiResponse.code
-            data: apiResponse.data, // 使用 apiResponse.data
-            responseTime: apiResponse.responseTime || '', // 使用 apiResponse.responseTime 或默认 0
-            headers: apiResponse.headers || '', // 使用 apiResponse.headers 或默认空对象
-          });
-          message.success('接口调试成功');
-        }
+        apiResponse = await ipInfo();
       } else if (apiInfo.url?.includes("/api/open/uuid-batch")) {
         console.log("callUUIDGeneReq当前值：", callUUIDGeneReq);
-        const apiResponse: API.ApiResponseCallOpenApi = await uuidBatch(callUUIDGeneReq);
-        console.log("apiResponse = ", apiResponse);
-        if (apiResponse.code != 200) {
-          console.log("API调用失败, apiResponse = ", apiResponse);
-          // 如果 API 调用失败，设置错误信息
-          setResponseData({
-            code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
-            message: apiResponse.message || "请求失败，请检查网络连接或API配置",
-          });
-        } else {
-          // 如果 API 调用成功，设置响应数据
-          setResponseData({
-            code: apiResponse.code, // 使用 apiResponse.code
-            data: apiResponse.data, // 使用 apiResponse.data
-            responseTime: apiResponse.responseTime || '', // 使用 apiResponse.responseTime 或默认 0
-            headers: apiResponse.headers || '', // 使用 apiResponse.headers 或默认空对象
-          });
-          message.success('接口调试成功');
-        }
+        apiResponse = await uuidBatch(callUUIDGeneReq);
       } else {
         setResponseData({
           code: 500,
           message: "当前API不支持调用~",
         });
+        message.error("当前API不支持调用~");
+        return;
       }
+
+      // 处理 API 响应
+      handleApiResponse(apiResponse);
     } catch (error) {
       // 如果发生异常，设置错误信息
       setResponseData({
@@ -129,6 +106,32 @@ const ApiDebugPage = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+// 处理 API 响应的通用逻辑
+  const handleApiResponse = (apiResponse: API.ApiResponseCallOpenApi) => {
+    if (apiResponse.code !== 200) {
+      console.log("API调用失败, apiResponse = ", apiResponse);
+      // 如果 API 调用失败，设置错误信息
+      setResponseData({
+        code: apiResponse.code || 500, // 使用 apiResponse.code 或默认 500
+        message: apiResponse.message || "请求失败，请检查网络连接或API配置",
+      });
+      // @ts-ignore
+      if (apiResponse.code >= 201) {
+        message.error(apiResponse.message);
+      }
+    } else {
+      // 如果 API 调用成功，设置响应数据
+      setResponseData({
+        code: apiResponse.code, // 使用 apiResponse.code
+        message: apiResponse.message,
+        data: apiResponse.data, // 使用 apiResponse.data
+        responseTime: apiResponse.responseTime || '', // 使用 apiResponse.responseTime 或默认空字符串
+        headers: apiResponse.headers, // 使用 apiResponse.headers 或默认空对象
+      });
+      message.success('接口调试成功');
     }
   };
 
@@ -192,6 +195,7 @@ const ApiDebugPage = () => {
         breadcrumb: {},
       }}
     >
+      <GoBackButton/>
       <ProCard
         title="API基本信息"
         bordered
@@ -408,7 +412,7 @@ const ApiDebugPage = () => {
           headerBordered
           className="response-card"
         >
-          <Collapse defaultActiveKey={['1']} ghost>
+          <Collapse defaultActiveKey={['1','2','3']} ghost>
             <Panel header="响应状态" key="1">
               <div className="response-status">
                 <div>
@@ -417,14 +421,14 @@ const ApiDebugPage = () => {
                     // @ts-ignore
                     className={`status-code ${responseData.code < 300 ? 'success' : 'error'}`}
                   >
-              {responseData.code}
-            </span>
+                    {responseData.code}
+                  </span>
                 </div>
                 <div>
                   <span className="status-label">响应时间:</span>
                   <span className="status-value">
-              {responseData.responseTime} ms
-            </span>
+                    {responseData.responseTime} ms
+                  </span>
                 </div>
               </div>
             </Panel>
@@ -434,8 +438,8 @@ const ApiDebugPage = () => {
                 <div>
                   <span className="status-label">响应头:</span>
                   <span className="status-value">
-              {responseData.headers}
-            </span>
+                    {responseData.headers}
+                  </span>
                 </div>
               </div>
             </Panel>
@@ -445,8 +449,8 @@ const ApiDebugPage = () => {
                 <div>
                   <span className="status-label">响应体:</span>
                   <span className="status-value">
-              {JSON.stringify(responseData.data) || JSON.stringify(responseData.message)}
-            </span>
+                    {JSON.stringify(responseData.data) || JSON.stringify(responseData.message)}
+                   </span>
                 </div>
               </div>
             </Panel>

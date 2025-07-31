@@ -149,9 +149,9 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="API开放平台"
-          subTitle={'API开放平台 为开发人员提供三方api接口'}
+          logo={<img alt="logo" src="/logo2.png" />}
+          title="OpenAPIHub"
+          subTitle={'为开发人员提供好用的三方API接口 节省成本 提升开发效率'}
           initialValues={{
             autoLogin: true,
           }}

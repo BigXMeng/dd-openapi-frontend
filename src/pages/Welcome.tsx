@@ -116,7 +116,7 @@ const Welcome: React.FC = () => {
               color: token.colorTextHeading,
             }}
           >
-            欢迎使用API开放平台
+            欢迎使用OpenApiHub
           </div>
           <p
             style={{

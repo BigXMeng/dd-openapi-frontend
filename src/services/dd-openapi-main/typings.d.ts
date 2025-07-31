@@ -104,6 +104,8 @@ declare namespace API {
   };
 
   type InterfaceInfoVO = {
+    message: string;
+    code: number;
     data: any;
     /** 主键ID */
     id?: number;

@@ -16,6 +16,7 @@ const TableList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfoVO[]>([]);
 
   const handleDebug = (record: API.InterfaceInfoVO) => {
+    localStorage.setItem("current_interface_id", record.id + '');
     // 跳转到调试页面，携带接口数据作为状态
     history.push({
       pathname: `/interface/debug/${record.id}`,
@@ -28,7 +29,7 @@ const TableList: React.FC = () => {
       dataIndex: 'id',
       search: false, // 不在查询表单显示
       hideInForm: true, // 不在表单中显示（如果使用ModalForm）
-      hideInTable: true // 明确在表格中显示（默认值，可省略）
+      hideInTable: false // 明确在表格中显示（默认值，可省略）
     },
     {
       title: '接口名称',

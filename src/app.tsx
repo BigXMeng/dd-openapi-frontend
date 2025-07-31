@@ -155,6 +155,16 @@ export const request: RequestConfig = {
           Authorization: `Bearer ${token}`,
         };
       }
+      // 添加调用的接口的id标识
+      let currInterfaceId = null;
+      if (url?.startsWith('/ui-client/')) {
+        currInterfaceId = localStorage.getItem("current_interface_id");
+        console.log("请求拦截，当前请求方法为UI调试方法，请求头需携带接口标识id：", currInterfaceId)
+        config.headers = {
+          ...config.headers,
+          'X-Interface-Id': `${currInterfaceId}`,
+        };
+      }
 
       if(url == '/user/info' || url == '/auth/logout') {
         return config;
@@ -165,12 +175,10 @@ export const request: RequestConfig = {
         const accessKey = localStorage.getItem('accessKey');
         console.log("请求拦截，添加请求头accessKey：", accessKey);
         if (accessKey) {
-          if (accessKey) {
-            config.headers = {
-              ...config.headers,
-              'X-Access-Key': accessKey,
-            };
-          }
+          config.headers = {
+            ...config.headers,
+            'X-Access-Key': accessKey,
+          };
         }
       } catch (error) {
         console.error('Error adding apiKey headers:', error);
@@ -179,7 +187,7 @@ export const request: RequestConfig = {
     },
   ],
 
-  // 2 响应拦截器（新增）
+  // 2 响应拦截器
   responseInterceptors: [
     // 第一个拦截器：统一解析后端返回格式
     (response) => {
