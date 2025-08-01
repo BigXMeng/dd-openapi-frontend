@@ -189,4 +189,13 @@ declare namespace API {
   type ApiKeyHeaders = {
     accessKey?: String,
   };
+
+  type InterfaceInvokeTop3InfoVO = {
+    // @Schema(description = "接口名")
+    interfaceName?: string;
+    // @Schema(description = "接口名id标识")
+    interfaceInfoId?: number;
+    // @Schema(description = "接口被调用总数")
+    invokedTotalNum?: number;
+  }
 }

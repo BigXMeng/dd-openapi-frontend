@@ -38,6 +38,12 @@ export async function get(id: string | number) {
   });
 }
 
+export async function interfaceInvokeTop3InfoVO() {
+  return request<API.InterfaceInfoVO>(`/statistic/top-3`, {
+    method: "GET",
+  });
+}
+
 /** 此处后端没有提供注释 POST /interface/page */
 export async function page(
   body: API.InterfaceInfoQueryReq,

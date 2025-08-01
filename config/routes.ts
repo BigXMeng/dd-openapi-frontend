@@ -12,7 +12,7 @@ export default [
     access: 'canAdmin',
     routes: [
       { path: '/admin', redirect: '/admin/sub-page' },
-      { path: '/admin/sub-page', name: '接口调用统计', component: './InterfaceStatistic' },
+      { path: '/admin/sub-page', name: '接口调用top3统计', component: './InterfaceStatistic' },
       { path: '/admin/api-admin-list', name: '开放API管理', component: './interface/AdminList' },
     ],
   },

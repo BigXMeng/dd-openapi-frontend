@@ -17,7 +17,7 @@ const Settings: ProLayoutProps & {
   colorWeak: false,
   title: 'OpenAPIHub',
   pwa: true,
-  logo: '/logo2.png',
+  logo: '/openapi_logo_final.png',
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式

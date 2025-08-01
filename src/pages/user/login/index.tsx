@@ -149,7 +149,7 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo2.png" />}
+          logo={<img alt="logo" src="/openapi_logo_final.png" />}
           title="OpenAPIHub"
           subTitle={'为开发人员提供好用的三方API接口 节省成本 提升开发效率'}
           initialValues={{

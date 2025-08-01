@@ -57,11 +57,11 @@ const TableList: React.FC = () => {
       dataIndex: 'userAccount',
       valueType: 'textarea',
     },
-    {
-      title: '接口地址',
-      dataIndex: 'url',
-      valueType: 'textarea',
-    },
+    // {
+    //   title: '接口地址',
+    //   dataIndex: 'url',
+    //   valueType: 'textarea',
+    // },
     {
       title: '状态',
       dataIndex: 'status',
@@ -71,6 +71,7 @@ const TableList: React.FC = () => {
         0: {text: '已下线', status: 'Error'},
         1: {text: '上线中', status: 'Success'},
       },
+      width: 80,
     },
     {
       title: '方法',
@@ -84,14 +85,31 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: '可调用',
-      render: (_, record) => `${record.userInterfaceInvokeInfoVO?.invokeLeftNum ?? '0'}次`, // 拼接"次"
+      title: '可调用次数',
+      render: (_, record) => {
+        const invokeLeftNum = record.userInterfaceInvokeInfoVO?.invokeLeftNum ?? 0;
+        const color = invokeLeftNum > 0 ? '#32CD32' : '#FF0000'; // 绿色或红色
+        return (
+          <span style={{ color }}>
+        {invokeLeftNum}次
+      </span>
+        );
+      },
       valueType: 'textarea',
+      width: 60,
     },
     {
-      title: '已调用',
-      render: (_, record) => `${record.userInterfaceInvokeInfoVO?.invokedNum ?? '0'}次`, // 拼接"次"
+      title: '已调用次数',
+      render: (_, record) => {
+        const invokedNum = record.userInterfaceInvokeInfoVO?.invokedNum ?? 0;
+        return (
+          <span style={{ color: '#000000' }}>
+            {invokedNum}次
+      </span>
+        );
+      },
       valueType: 'textarea',
+      width: 60,
     },
     {
       title: '操作',
@@ -109,6 +127,7 @@ const TableList: React.FC = () => {
           开通调用次数
         </a>,
       ],
+      width: 100,
     }
   ];
 
