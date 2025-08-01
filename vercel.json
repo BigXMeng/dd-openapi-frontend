@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/auth-api/(.*)",
+      "destination": "/api/auth-proxy"
+    },
+    {
+      "source": "/openapi-main-api/(.*)",
+      "destination": "/api/openapi-proxy"
+    }
+  ]
+}

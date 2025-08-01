@@ -126,8 +126,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
 // @ts-ignore
 export const request: RequestConfig = {
-  // 注意：开发环境不要设置 baseURL，使用代理前缀
-  baseURL: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_GATEWAY : undefined,
+  // 开发环境不要设置 baseURL，使用代理前缀
+  baseURL: process.env.NODE_ENV === 'production' ? '' : undefined,
 
   // 1 请求拦截器
   requestInterceptors: [
