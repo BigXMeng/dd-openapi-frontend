@@ -127,7 +127,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 // @ts-ignore
 export const request: RequestConfig = {
   // 开发环境不要设置 baseURL，使用代理前缀
-  baseURL: process.env.NODE_ENV === 'production' ? '' : undefined,
+  baseURL: process.env.NODE_ENV === 'production' ? '' : '',
 
   // 1 请求拦截器
   requestInterceptors: [
@@ -135,10 +135,12 @@ export const request: RequestConfig = {
       console.log("当前请求的url为：", config.url);
       // 动态设置服务URL
       const url = config.url;
-      const service = detectServiceFromUrl(url);
-      console.log("当前请求的service为：", service);
+
+      // 统一处理：所有环境都添加服务前缀
+      const service = detectServiceFromUrl(config.url);
       if (service) {
-        config.url = getServiceBaseURL(service) + config.url;
+        // 关键修改：始终添加服务前缀
+        config.url = `/${service}-api${config.url}`;
         console.log("修改后的url为：", config.url);
       }
 
@@ -219,24 +221,24 @@ export const request: RequestConfig = {
 // 后端服务类型定义
 type ServiceType = 'auth' | 'openapi-main';
 
-// 获取服务基础URL
-const getServiceBaseURL = (service: ServiceType) => {
-  if (process.env.NODE_ENV === 'development') {
-    // 开发环境使用代理前缀
-    return `/${service}-api`;
-  }
-  // 生产环境使用环境变量配置
-  return process.env[`REACT_APP_${service.toUpperCase()}_API`] || '';
-};
-
 // 辅助函数：根据URL识别服务类型
 function detectServiceFromUrl(url?: string): ServiceType | null {
   if (!url) return null;
-  if (url.startsWith('/auth/') || url.startsWith('/user/')) return 'auth';
-  if (url.startsWith('/interface/')) return 'openapi-main';
-  if (url.startsWith('/statistic/')) return 'openapi-main';
-  if (url.startsWith('/ui-client/')) return 'openapi-main';
-  if (url.startsWith('/user-interface/')) return 'openapi-main';
-  if (url.startsWith('/sdk/')) return 'openapi-main';
+
+  // 移除路径前缀检测，直接根据功能分组
+  if (
+    url.includes('/login') ||
+    url.includes('/user/') ||
+    url === '/auth/logout'
+  ) return 'auth';
+
+  if (
+    url.includes('/interface/') ||
+    url.includes('/statistic/') ||
+    url.includes('/ui-client/') ||
+    url.includes('/user-interface/') ||
+    url.includes('/sdk/')
+  ) return 'openapi-main';
+
   return null;
 }
