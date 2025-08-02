@@ -22,6 +22,7 @@ import {
 } from "@/services/dd-openapi-main/apiClientController";
 import {undefined} from "@umijs/utils/compiled/zod";
 import GoBackButton from "@/components/GoBackButton";
+import {useModel} from "@@/exports";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -71,9 +72,9 @@ const ApiDebugPage = () => {
   // 处理调试请求
   const handleDebug = async (values: any) => {
     // 判断当前的API调用次数是否已用完 用完则不可再调用
-    // if (apiInfo.userInterfaceInvokeInfoVO?.invokeLeftNum === 0) {
-    //   message.error("您对次API的调用次数已用完，请再次开通。");
-    //   return;
+    // @ts-ignore
+    // if (initialState.currentUser.accessKey === null || initialState.currentUser.accessKey.length === 0) {
+    //   message.error("您尚未申请apiKey 请在页面右上角申请");
     // }
 
     try {
@@ -86,6 +87,10 @@ const ApiDebugPage = () => {
         apiResponse = await ipInfo();
       } else if (apiInfo.url?.includes("/api/open/uuid-batch")) {
         console.log("callUUIDGeneReq当前值：", callUUIDGeneReq);
+        if(callUUIDGeneReq == null) {
+          message.warning("该方法请求体不可为空");
+          return;
+        }
         apiResponse = await uuidBatch(callUUIDGeneReq);
       } else {
         setResponseData({
@@ -109,7 +114,7 @@ const ApiDebugPage = () => {
     }
   };
 
-// 处理 API 响应的通用逻辑
+  // 处理 API 响应的通用逻辑
   const handleApiResponse = (apiResponse: API.ApiResponseCallOpenApi) => {
     if (apiResponse.code !== 200) {
       console.log("API调用失败, apiResponse = ", apiResponse);

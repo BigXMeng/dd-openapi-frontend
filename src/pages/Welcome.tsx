@@ -1,7 +1,9 @@
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { Card, theme } from 'antd';
+import {Button, Card, theme} from 'antd';
 import React from 'react';
+import { Image } from 'antd';
+import ProList from "@ant-design/pro-list/lib";
 
 /**
  * 每个单独的卡片，为了复用样式抽成了组件
@@ -83,6 +85,21 @@ const InfoCard: React.FC<{
   );
 };
 
+const dataSource = [
+  {
+    id: 1,
+    title: '系统架构图',
+    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/c39ade6b-cfaa-498c-9a8e-924832d15566.png',
+    content: '系统架构分为五大模块，分别为后端主体模块、API服务提供模块、用户权限模块、SDK模块、前端模块（AntDesignPro）。其中，用户权限模块会向网关、后端主体模块、API提供模块提供查询用户信息的Dubbo服务；用户主体模块会向API提供模块提供API调用计数的Dubbo服务。'
+  },
+  {
+    id: 2,
+    title: '系统用例图',
+    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/5c336eb9-bec9-45f5-935f-8689b1a18852.png',
+    content: '系统用例包括管理员和普通用户。管理员用例包括对要开放的API进行发布、下线、在线调试、SDK上传、接口调用统计分析；用户用例包括接口查看、申请调用额度、申请APIKey在线调试、下载SDK在代码中调用接口等。'
+  },
+];
+
 const Welcome: React.FC = () => {
   const { token } = theme.useToken();
   const { initialState } = useModel('@@initialState');
@@ -128,36 +145,44 @@ const Welcome: React.FC = () => {
               width: '65%',
             }}
           >
-            一个提供 API 接口供开发者调用的平台。
-            管理员可以接入并发布接口，统计分析各接口调用情况；用户可以注册登录并开通接口调用权限，然后浏览接口及在线调试，还能使用客户端 SDK 轻松在代码中调用接口。
+            开放API接口提供平台，为开发人员提供三方接口，提升开发效率，节省开发成本。用户可以注册登录并开通接口调用权限，浏览接口在线调试、在客户端使用SDK轻松调用接口。
           </p>
-          {/*<div*/}
-          {/*  style={{*/}
-          {/*    display: 'flex',*/}
-          {/*    flexWrap: 'wrap',*/}
-          {/*    gap: 16,*/}
-          {/*  }}*/}
-          {/*>*/}
-          {/*  <InfoCard*/}
-          {/*    index={1}*/}
-          {/*    href="https://umijs.org/docs/introduce/introduce"*/}
-          {/*    title="了解 umi"*/}
-          {/*    desc="umi 是一个可扩展的企业级前端应用框架,umi 以路由为基础的，同时支持配置式路由和约定式路由，保证路由的功能完备，并以此进行功能扩展。"*/}
-          {/*  />*/}
-          {/*  <InfoCard*/}
-          {/*    index={2}*/}
-          {/*    title="了解 ant design"*/}
-          {/*    href="https://ant.design"*/}
-          {/*    desc="antd 是基于 Ant Design 设计体系的 React UI 组件库，主要用于研发企业级中后台产品。"*/}
-          {/*  />*/}
-          {/*  <InfoCard*/}
-          {/*    index={3}*/}
-          {/*    title="了解 Pro Components"*/}
-          {/*    href="https://procomponents.ant.design"*/}
-          {/*    desc="ProComponents 是一个基于 Ant Design 做了更高抽象的模板组件，以 一个组件就是一个页面为开发理念，为中后台开发带来更好的体验。"*/}
-          {/*  />*/}
-          {/*</div>*/}
+          <div
+            style={{
+              fontSize: '20px',
+              color: token.colorTextHeading,
+            }}
+          >
+            系统架构
+          </div>
         </div>
+
+        <ProList<{ title: string; imageUrl: string; content: string }>
+          itemLayout="vertical"
+          rowKey="id"
+          dataSource={dataSource}
+          metas={{
+            title: {
+              render: (_, record) => <div>{record.title}</div>,
+            },
+            extra: {
+              render: (_: any, record: { imageUrl: string | undefined; }) => (
+                <Image
+                  width={700}
+                  src={record.imageUrl}
+                  alt="图片"
+                />
+              ),
+            },
+            content: {
+              render: (_, record) => (
+                <div>
+                  {record.content}
+                </div>
+              ),
+            },
+          }}
+        />
       </Card>
     </PageContainer>
   );

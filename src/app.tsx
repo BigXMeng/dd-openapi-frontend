@@ -229,7 +229,7 @@ function detectServiceFromUrl(url?: string): ServiceType | null {
   if (
     url.includes('/login') ||
     url.includes('/user/') ||
-    url === '/auth/logout'
+    url.includes('/auth/')
   ) return 'auth';
 
   if (

@@ -79,11 +79,11 @@ const Login: React.FC = () => {
       console.log("登录响应结果：", rst);
       if (rst.code === 200 || rst.code === 201) {
         console.log("提示登录成功：", '登录成功！持续2秒');
-        message.success('登录成功！', 500);
+        message.success('登录成功！');
         if (rst.data?.accessToken) {
           localStorage.setItem('token', rst.data.accessToken);
         } else {
-          message.error('登录失败：服务端未返回token');
+          message.error('登录失败 服务端未返回token');
           return;
         }
         // 获取用户信息
@@ -100,11 +100,12 @@ const Login: React.FC = () => {
           window.location.href = urlParams.get('redirect') || '/';
         }, 500);
         return;
+      } else if (rst.code === 401 || rst.code === 403) {
+        message.error(rst.message)
       }
     } catch (error) {
-      const defaultLoginFailureMessage = '登录失败，请重试！';
       console.log(error);
-      message.error(defaultLoginFailureMessage);
+      message.error("登陆失败，可能是服务端错误");
     }
   };
 

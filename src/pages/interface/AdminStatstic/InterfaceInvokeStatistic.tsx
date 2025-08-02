@@ -15,6 +15,7 @@ const InterfaceStatistic: React.FC = () => {
       try {
         const result: API.ApiResponseCallOpenApi = await interfaceInvokeTop3InfoVO();
         if (result.code === 200) {
+          // @ts-ignore
           setData(result.data?.slice(0, 3)); // 只取Top3数据
         }
 
@@ -57,6 +58,7 @@ const InterfaceStatistic: React.FC = () => {
       <div style={{marginTop: 24}}>
         <StatisticCard
           title="总调用次数"
+          // @ts-ignore
           value={data.reduce((acc, item) => acc + item.invokedTotalNum, 0)}
           chart={<></>}
         />

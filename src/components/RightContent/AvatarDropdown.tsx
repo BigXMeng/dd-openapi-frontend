@@ -1,7 +1,7 @@
 import {ApiOutlined, CloudDownloadOutlined, LogoutOutlined,} from '@ant-design/icons';
 // @ts-ignore
 import {history, useModel} from '@umijs/max';
-import {Button, MenuProps, message, Modal, Spin} from 'antd';
+import {Alert, Button, Form, Input, MenuProps, message, Modal, Space, Spin} from 'antd';
 import {createStyles} from 'antd-style';
 import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
@@ -47,6 +47,10 @@ const useStyles = createStyles(({ token }) => {
 const ApiKeyModal = ({apiKeyModalVisible, setApiKeyModalVisible}) => {
   const [accessKey, setAccessKey] = useState<string>('待获取');
   const [secretKey, setSecretKey] = useState<string>('待获取');
+  const {
+    initialState,           // 当前应用的全局初始状态对象
+    setInitialState         // 更新全局状态的函数
+  } = useModel('@@initialState');
 
   const handleGenerateApiKey = async () => {
     try {
@@ -67,23 +71,67 @@ const ApiKeyModal = ({apiKeyModalVisible, setApiKeyModalVisible}) => {
     <Modal
       title="API Key 获取"
       open={apiKeyModalVisible}
-      onCancel={() => setApiKeyModalVisible(false)}
+      onCancel={() => {
+        setAccessKey('待获取');
+        setSecretKey('待获取');
+        setApiKeyModalVisible(false);
+      }}
       footer={[
-        <Button key="close" onClick={() => {
-          setAccessKey('待获取');
-          setSecretKey('待获取');
-          setApiKeyModalVisible(false)
-        }}>
+        <Button
+          key="close"
+          onClick={() => {
+            setAccessKey('待获取');
+            setSecretKey('待获取');
+            setApiKeyModalVisible(false);
+          }}
+        >
           关闭
         </Button>,
-        <Button key="generate" type="primary" onClick={handleGenerateApiKey}>
+        <Button
+          key="generate"
+          type="primary"
+          onClick={handleGenerateApiKey}
+          style={{ minWidth: 120 }}
+        >
           生成 API Key
         </Button>,
       ]}
+      width={600}
     >
-      <div>
-        <p>[Access Key] <span>{accessKey}</span></p>
-        <p>[Secret Key] <span>{secretKey}</span></p>
+      <div style={{ padding: '16px 0' }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: 8,
+            fontSize: 14,
+            color: 'rgba(0, 0, 0, 0.65)'
+          }}>
+            <span style={{ width: 100 }}>Access Key:</span>
+            <Input
+              value={accessKey}
+              style={{ flex: 1 }}
+            />
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: 14,
+            color: 'rgba(0, 0, 0, 0.65)'
+          }}>
+            <span style={{ width: 100 }}>Secret Key:</span>
+            <Input
+              value={secretKey}
+              style={{ flex: 1 }}
+            />
+          </div>
+        </div>
+        <Alert
+          message="安全提示"
+          description="请妥善保管您的APIKey和SecretKey，及时保存。"
+          type="warning"
+          showIcon
+        />
       </div>
     </Modal>
   );
