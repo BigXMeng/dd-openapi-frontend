@@ -10,8 +10,8 @@ const Zipkin = () => {
       width: '100%'
     }}>
       <iframe
-        // src="http://43.136.170.102:3000/d/X034JGT7Gz/apps&kiosk"
-        src="/grafana-proxy/d/X034JGT7Gz/apps?orgId=1&kiosk"
+        src="http://43.136.170.102:3000/d/X034JGT7Gz/apps&kiosk"
+        // src="/grafana-proxy/d/X034JGT7Gz/apps?orgId=1&kiosk"
         style={{
           width: '90%',
           height: '700px',

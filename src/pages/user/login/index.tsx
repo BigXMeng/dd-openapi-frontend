@@ -4,10 +4,9 @@ import {LoginForm, ProFormText,} from '@ant-design/pro-components';
 import {App, Button, Tabs} from 'antd';
 import {createStyles} from 'antd-style';
 import React, {useState} from 'react';
-import {flushSync} from 'react-dom';
-import {useModel} from 'umi';
 import {getCurrentUserInfo, login, register} from "@/services/dd-ms-auth/authController";
 import Settings from '../../../../config/defaultSettings';
+// @ts-ignore
 import {Helmet} from "@@/exports";
 
 const useStyles = createStyles(({ token }) => {
@@ -51,24 +50,8 @@ const Login: React.FC = () => {
     operationType,
     updateOperationType
   ] = useState<string>('login');
-  const {
-    initialState,           // 当前应用的全局初始状态对象
-    setInitialState         // 更新全局状态的函数
-  } = useModel('@@initialState');
   const { styles } = useStyles();
   const { message } = App.useApp();
-
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
-    }
-  };
 
   const handleSubmit = async (values: API.LoginReq) => {
     try {
