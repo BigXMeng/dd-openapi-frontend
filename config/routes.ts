@@ -11,21 +11,21 @@ export default [
     icon: 'crown',
     access: 'canAdmin',
     routes: [
-      { path: '/admin', redirect: '/admin/sub-page' },
-      { path: '/admin/sub-page', name: '接口调用top3统计', component: './interface/AdminStatistic' },
+      { path: '/admin', redirect: '/api-invoke-top3' },
+      { path: '/admin/api-invoke-top3', name: '接口调用top3统计', component: './interface/AdminStatistic' },
       { path: '/admin/api-admin-list', name: '开放API管理', component: './interface/AdminList' },
     ],
   },
   {
     name: '开放API列表',
     icon: 'table',
-    path: '/interface/UserList',
+    path: '/interface/user-list',
     component: './interface/UserList',
   },
   {
     path: '/monitor',
     name: '系统监控',
-    icon: 'crown',
+    icon: 'dashboard',
     access: 'canAdmin',
     routes: [
       { path: '/monitor', redirect: '/monitor/link-tracing' },
