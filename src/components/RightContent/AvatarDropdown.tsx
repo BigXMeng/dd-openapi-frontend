@@ -1,7 +1,7 @@
 import {ApiOutlined, CloudDownloadOutlined, LogoutOutlined,} from '@ant-design/icons';
 // @ts-ignore
 import {history, useModel} from '@umijs/max';
-import {Alert, Button, Form, Input, MenuProps, message, Modal, Space, Spin} from 'antd';
+import {Alert, App, Button, Form, Input, MenuProps, Modal, Space, Spin} from 'antd';
 import {createStyles} from 'antd-style';
 import React, {useState} from 'react';
 import {flushSync} from 'react-dom';
@@ -47,10 +47,7 @@ const useStyles = createStyles(({ token }) => {
 const ApiKeyModal = ({apiKeyModalVisible, setApiKeyModalVisible}) => {
   const [accessKey, setAccessKey] = useState<string>('待获取');
   const [secretKey, setSecretKey] = useState<string>('待获取');
-  const {
-    initialState,           // 当前应用的全局初始状态对象
-    setInitialState         // 更新全局状态的函数
-  } = useModel('@@initialState');
+  const { message } = App.useApp();
 
   const handleGenerateApiKey = async () => {
     try {
@@ -142,7 +139,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
 
   const {initialState, setInitialState} = useModel('@@initialState');
   const {styles} = useStyles();
-
+  const { message } = App.useApp();
   const [apiKeyModalVisible, setApiKeyModalVisible] = useState(false);
 
   /** 真正的退出登录逻辑 */

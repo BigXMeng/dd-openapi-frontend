@@ -12,7 +12,7 @@ export default [
     access: 'canAdmin',
     routes: [
       { path: '/admin', redirect: '/admin/sub-page' },
-      { path: '/admin/sub-page', name: '接口调用top3统计', component: './InterfaceStatistic' },
+      { path: '/admin/sub-page', name: '接口调用top3统计', component: './interface/AdminStatistic' },
       { path: '/admin/api-admin-list', name: '开放API管理', component: './interface/AdminList' },
     ],
   },
@@ -21,6 +21,18 @@ export default [
     icon: 'table',
     path: '/interface/UserList',
     component: './interface/UserList',
+  },
+  {
+    path: '/monitor',
+    name: '系统监控',
+    icon: 'crown',
+    access: 'canAdmin',
+    routes: [
+      { path: '/monitor', redirect: '/monitor/link-tracing' },
+      { path: '/monitor/link-tracing', name: '分布式链路调用追踪', component: './monitor/LinkTracing' },
+      { path: '/monitor/metrics/servers', name: '服务器指标监控', component: './monitor/metrics/Servers' },
+      { path: '/monitor/metrics/apps', name: '应用指标监控', component: './monitor/metrics/Apps' },
+    ],
   },
   {
     name: '接口在线调试',

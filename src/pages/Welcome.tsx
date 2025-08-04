@@ -89,13 +89,13 @@ const dataSource = [
   {
     id: 1,
     title: '系统架构图',
-    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/c39ade6b-cfaa-498c-9a8e-924832d15566.png',
+    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/34be6192-9568-43df-99fc-b06bd82ae6cf.png',
     content: '系统架构分为五大模块，分别为后端主体模块、API服务提供模块、用户权限模块、SDK模块、前端模块（AntDesignPro）。其中，用户权限模块会向网关、后端主体模块、API提供模块提供查询用户信息的Dubbo服务；用户主体模块会向API提供模块提供API调用计数的Dubbo服务。'
   },
   {
     id: 2,
     title: '系统用例图',
-    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/5c336eb9-bec9-45f5-935f-8689b1a18852.png',
+    imageUrl: 'https://bigbigmeng-cd-f-1317734527.cos.ap-chengdu.myqcloud.com/dd-openapi/202508/6021b7f1-e990-4228-91b3-ae10b8507081.png',
     content: '系统用例包括管理员和普通用户。管理员用例包括对要开放的API进行发布、下线、在线调试、SDK上传、接口调用统计分析；用户用例包括接口查看、申请调用额度、申请APIKey在线调试、下载SDK在代码中调用接口等。'
   },
 ];

@@ -6,7 +6,7 @@ import { interfaceInvokeTop3InfoVO } from "@/services/dd-openapi-main/apiInfoCon
 
 const { Text } = Typography;
 
-const InterfaceStatistic: React.FC = () => {
+const Index: React.FC = () => {
   const [data, setData] = useState<API.InterfaceInvokeTop3InfoVO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -106,4 +106,4 @@ const InterfaceStatistic: React.FC = () => {
   );
 };
 
-export default InterfaceStatistic;
+export default Index;

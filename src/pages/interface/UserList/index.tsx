@@ -5,7 +5,6 @@ import React, {useRef, useState} from 'react';
 import {page} from "@/services/dd-openapi-main/apiInfoController";
 import {history} from "@@/core/history";
 import EnableInvokeModal, { EnableInvokeModalRef } from '@/pages/interface/components/EnableInvokeModal';
-import UpdateForm from "@/pages/interface/components/UpdateForm";
 
 const TableList: React.FC = () => {
   const enableInvokeModalRef = useRef<EnableInvokeModalRef>(null);
