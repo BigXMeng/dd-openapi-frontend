@@ -7,6 +7,14 @@
     {
       "source": "/openapi-main-api/(.*)",
       "destination": "/api/openapi-proxy"
+    },
+    {
+      "source": "/zipkin-proxy/:path*",
+      "destination": "http://47.108.200.157:9411/:path*"
+    },
+    {
+      "source": "/grafana-proxy/:path*",
+      "destination": "http://43.136.170.102:3000/:path*"
     }
   ]
 }
