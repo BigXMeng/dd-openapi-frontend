@@ -8,16 +8,5 @@
       "source": "/openapi-main-api/(.*)",
       "destination": "/api/openapi-proxy"
     }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "upgrade-insecure-requests; frame-src 'self' http://47.108.200.157:9411 http://43.136.170.102:3000;"
-        }
-      ]
-    }
   ]
 }

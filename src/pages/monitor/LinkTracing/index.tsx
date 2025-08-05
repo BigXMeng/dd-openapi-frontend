@@ -1,14 +1,24 @@
-import React from 'react';
+// import React from 'react';
+//
+// const Zipkin = () => {
+//   return (
+//       <iframe
+//         src="http://47.108.200.157:9411/zipkin/"
+//         // src="/zipkin-proxy/zipkin/"
+//         style={{ width: '100%', height: '800px', border: 'none' }}
+//         title="Zipkin链路调用追踪"
+//       />
+//   );
+// };
+//
+// export default Zipkin;
 
-const Zipkin = () => {
-  return (
-      <iframe
-        src="http://47.108.200.157:9411/zipkin/"
-        // src="/zipkin-proxy/zipkin/"
-        style={{ width: '100%', height: '800px', border: 'none' }}
-        title="Zipkin链路调用追踪"
-      />
-  );
-};
+import { useEffect } from 'react';
 
-export default Zipkin;
+export default function LinkTracing() {
+  useEffect(() => {
+    window.open('http://47.108.200.157:9411/zipkin/', '_blank');
+  }, []);
+
+  return null;
+}

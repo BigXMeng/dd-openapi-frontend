@@ -28,7 +28,6 @@ export default [
     icon: 'dashboard',
     access: 'canAdmin',
     routes: [
-      { path: '/monitor', redirect: '/monitor/link-tracing' },
       { path: '/monitor/link-tracing', name: '分布式链路调用追踪', component: './monitor/LinkTracing' },
       { path: '/monitor/metric/server', name: '服务器指标监控', component: './monitor/metric/Server' },
       { path: '/monitor/metric/app', name: '应用指标监控', component: './monitor/metric/App' },
