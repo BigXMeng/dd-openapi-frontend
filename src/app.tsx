@@ -144,7 +144,8 @@ export const request: RequestConfig = {
         console.log("修改后的url为：", config.url);
       }
 
-      if(url == '/auth/login') {
+      // 登陆和退出登陆不需要携带token
+      if(url == '/auth/login' || url == '/auth/logout') {
         return config;
       }
 
@@ -197,12 +198,12 @@ export const request: RequestConfig = {
     },
   ],
 
-  // 3 统一错误处理（可选）
+  // 3 统一错误处理
   errorConfig: {
     errorThrower: (res) => {
       // 如果后端返回的 code !== 0 就抛出错误
       const { code, message: msg } = res as { code: number; message: string; data: any };
-      if (code >= 300) {
+      if (code >= 500) {
         throw new Error(msg || 'Request Error');
       }
     },
@@ -241,4 +242,12 @@ function detectServiceFromUrl(url?: string): ServiceType | null {
   ) return 'openapi-main';
 
   return null;
+}
+
+// 清除token并跳转登录页的辅助函数
+function clearTokensAndRedirect() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('expiresAt');
+  history.push('/user/login');
 }

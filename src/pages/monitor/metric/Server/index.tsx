@@ -30,7 +30,7 @@ import { useEffect } from 'react';
 
 export default function LinkTracing() {
   useEffect(() => {
-    window.open('http://43.136.170.102:3000/d/rYdddlPWk/nodes?orgId=1&kiosk', '_blank');
+    window.open('http://43.136.170.102:3000/d/rYdddlPWk/nodes?orgId=1&kiosk=full', '_blank');
   }, []);
 
   return null;

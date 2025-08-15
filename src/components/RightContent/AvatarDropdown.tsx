@@ -146,7 +146,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, children
   const logoutS = async () => {
     try {
       // 2️⃣ 先调用后端退出接口
-      await logout();
+      // await logout();
       message.success('已退出登录');
     } catch (error) {
       // 即使接口失败也允许前端退出，防止卡死
